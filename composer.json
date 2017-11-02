@@ -1,0 +1,36 @@
+{
+	"name": "finesse/mini-db",
+	"description": "Light database abstraction with a query builder",
+	"keywords": ["sql", "query builder", "database", "mysql", "sqlite", "pdo"],
+	"type": "library",
+	"homepage": "https://github.com/FinesseRus/MiniDB",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Surgie Finesse",
+			"email": "finesserus@gmail.com"
+		}
+	],
+	"require": {
+		"php": ">=7.0",
+		"finesse/micro-db": "^0.2.0",
+		"finesse/query-scribe": "^0.2.0"
+	},
+	"require-dev": {
+		"ext-pdo_sqlite": "*",
+		"phpunit/phpunit": "^6.4"
+	},
+	"autoload": {
+		"psr-4": {
+			"Finesse\\MiniDB\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Finesse\\MiniDB\\Tests\\": "tests/"
+		}
+	},
+	"scripts": {
+		"test": "vendor/bin/phpunit"
+	}
+}
