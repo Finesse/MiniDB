@@ -14,6 +14,7 @@ use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInv
 use Finesse\QueryScribe\GrammarInterface;
 use Finesse\QueryScribe\Grammars\CommonGrammar;
 use Finesse\QueryScribe\Grammars\MySQLGrammar;
+use Finesse\QueryScribe\Grammars\SQLiteGrammar;
 use Finesse\QueryScribe\MakeRawTrait;
 use Finesse\QueryScribe\StatementInterface;
 
@@ -80,8 +81,11 @@ class Database
             case 'mysql':
                 $grammar = new MySQLGrammar();
                 break;
+            case 'sqlite':
+                $grammar = new SQLiteGrammar();
+                break;
             default:
-                $grammar = new CommonGrammar();
+                $grammar = null;
         }
 
         return new static($connection, $grammar, $config['prefix'] ?? '');

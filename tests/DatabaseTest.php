@@ -12,6 +12,7 @@ use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvali
 use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInvalidReturnValueException;
 use Finesse\QueryScribe\Grammars\CommonGrammar;
 use Finesse\QueryScribe\Grammars\MySQLGrammar;
+use Finesse\QueryScribe\Grammars\SQLiteGrammar;
 
 /**
  * Tests the Database class
@@ -33,7 +34,7 @@ class DatabaseTest extends TestCase
         $this->assertEquals('', $database->getTablePrefix());
 
         $database = Database::create([
-            'driver' => 'MySQL',
+            'driver' => 'SQLite',
             'dns' => 'sqlite::memory:',
             'username' => null,
             'password' => null,
@@ -41,8 +42,11 @@ class DatabaseTest extends TestCase
             'prefix' => 'test_'
         ]);
         $this->assertInstanceOf(Connection::class, $database->getConnection());
-        $this->assertInstanceOf(MySQLGrammar::class, $database->getGrammar());
+        $this->assertInstanceOf(SQLiteGrammar::class, $database->getGrammar());
         $this->assertEquals('test_', $database->getTablePrefix());
+
+        $database = Database::create(['driver' => 'MySQL', 'dns' => 'sqlite::memory:']);
+        $this->assertInstanceOf(MySQLGrammar::class, $database->getGrammar());
 
         $this->assertException(DatabaseException::class, function () {
             Database::create([
@@ -62,7 +66,7 @@ class DatabaseTest extends TestCase
             'INSERT INTO test (name, value) VALUES (?, ?), (?, ?), (?, ?)',
             ['Banana', 123.4, 'Apple', -10, 'Pen', 0]
         );
-        $database = new Database($connection);
+        $database = new Database($connection, new SQLiteGrammar());
 
         // Select
         $this->assertEquals([
@@ -118,7 +122,7 @@ class DatabaseTest extends TestCase
      */
     public function testCreateQuery()
     {
-        $database = Database::create(['dns' => 'sqlite::memory:', 'prefix' => 'test_']);
+        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'test_']);
         $query = $database->table('items', 'i');
         $this->assertEquals('test_items', $query->table);
         $this->assertEquals('i', $query->tableAlias);
@@ -143,7 +147,7 @@ class DatabaseTest extends TestCase
      */
     public function testErrors()
     {
-        $database = Database::create(['dns' => 'sqlite::memory:']);
+        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:']);
 
         // Wrapping Connection PDOException
         $this->assertException(DatabaseException::class, function () use ($database) {
@@ -173,7 +177,7 @@ class DatabaseTest extends TestCase
                 throw new \Exception('test');
             }
         };
-        $database = new Database($connection);
+        $database = new Database($connection, new SQLiteGrammar());
         $this->assertException(\Exception::class, function () use ($database) {
             $database->select('');
         }, function (\Exception $exception) {
