@@ -4,8 +4,11 @@ namespace Finesse\MiniDB;
 
 use Finesse\MiniDB\Exceptions\ExceptionInterface;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
+use Finesse\MiniDB\Exceptions\InvalidArgumentException;
+use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
 use Finesse\QueryScribe\Exceptions\InvalidQueryException as QueryScribeInvalidQueryException;
 use Finesse\QueryScribe\Query as BaseQuery;
+use Finesse\QueryScribe\StatementInterface;
 
 /**
  * Query builder. Builds SQL queries and performs them on a database.
@@ -59,8 +62,89 @@ class Query extends BaseQuery
     public function first()
     {
         return $this->performQuery(function () {
-            $compiled = $this->database->getGrammar()->compileSelect($this->limit(1));
+            $this->limit(1);
+            $compiled = $this->database->getGrammar()->compileSelect($this);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings());
+        });
+    }
+
+    /**
+     * Gets the count of the target rows.
+     *
+     * @param string|\Closure|self|StatementInterface $column Column to count
+     * @return int
+     */
+    public function count($column = '*'): int
+    {
+        return $this->performQuery(function () use ($column) {
+            $this->select = [];
+            $this->addCount($column, 'aggregate')->offset(null)->limit(null);
+            $compiled = $this->database->getGrammar()->compileSelect($this);
+            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
+        });
+    }
+
+    /**
+     * Gets the average value of the target rows.
+     *
+     * @param string|\Closure|self|StatementInterface $column Column to get average
+     * @return float|null Null is returned when no target row has a value
+     */
+    public function avg($column)
+    {
+        return $this->performQuery(function () use ($column) {
+            $this->select = [];
+            $this->addAvg($column, 'aggregate')->offset(null)->limit(null);
+            $compiled = $this->database->getGrammar()->compileSelect($this);
+            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
+        });
+    }
+
+    /**
+     * Gets the sum of the target rows.
+     *
+     * @param string|\Closure|self|StatementInterface $column Column to get sum
+     * @return float|null Null is returned when no target row has a value
+     */
+    public function sum($column)
+    {
+        return $this->performQuery(function () use ($column) {
+            $this->select = [];
+            $this->addSum($column, 'aggregate')->offset(null)->limit(null);
+            $compiled = $this->database->getGrammar()->compileSelect($this);
+            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
+        });
+    }
+
+    /**
+     * Gets the minimum value of the target rows.
+     *
+     * @param string|\Closure|self|StatementInterface $column Column to get minimum
+     * @return float|null Null is returned when no target row has a value
+     */
+    public function min($column)
+    {
+        return $this->performQuery(function () use ($column) {
+            $this->select = [];
+            $this->addMin($column, 'aggregate')->offset(null)->limit(null);
+            $compiled = $this->database->getGrammar()->compileSelect($this);
+            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
+        });
+    }
+
+    /**
+     * Gets the maximum value of the target rows.
+     *
+     * @param string|\Closure|self|StatementInterface $column Column to get maximum
+     * @return float|null Null is returned when no target row has a value
+     */
+    public function max($column)
+    {
+        return $this->performQuery(function () use ($column) {
+            $this->select = [];
+            $this->addMax($column, 'aggregate')->offset(null)->limit(null);
+            $compiled = $this->database->getGrammar()->compileSelect($this);
+            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         });
     }
 
@@ -75,6 +159,8 @@ class Query extends BaseQuery
     {
         try {
             return $callback();
+        } catch (QueryScribeInvalidArgumentException $exception) {
+            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
         } catch (QueryScribeInvalidQueryException $exception) {
             throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
         }
