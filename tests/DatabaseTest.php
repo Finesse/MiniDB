@@ -8,6 +8,8 @@ use Finesse\MicroDB\Exceptions\PDOException as ConnectionPDOException;
 use Finesse\MiniDB\Database;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
+use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
+use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInvalidReturnValueException;
 use Finesse\QueryScribe\Grammars\CommonGrammar;
 use Finesse\QueryScribe\Grammars\MySQLGrammar;
 
@@ -67,9 +69,6 @@ class DatabaseTest extends TestCase
             ['id' => 1, 'name' => 'Banana', 'value' => 123.4],
             ['id' => 3, 'name' => 'Pen', 'value' => 0]
         ], $database->select('SELECT * FROM test WHERE value >= ? ORDER BY id', [0]));
-        $this->assertException(DatabaseException::class, function () use ($database) {
-            $database->select('WRONG SQL');
-        });
 
         // Select first
         $this->assertEquals(
@@ -77,9 +76,6 @@ class DatabaseTest extends TestCase
             $database->selectFirst('SELECT * FROM test ORDER BY id')
         );
         $this->assertNull($database->selectFirst('SELECT * FROM test WHERE name = ?', ['Orange']));
-        $this->assertException(DatabaseException::class, function () use ($database) {
-            $database->selectFirst('WRONG SQL');
-        });
 
         // Insert and get the count
         $this->assertEquals(2, $database->insert(
@@ -87,16 +83,10 @@ class DatabaseTest extends TestCase
             ['Orange', 314, 'Pillow', 219]
         ));
         $this->assertEquals(5, $connection->selectFirst('SELECT COUNT(*) AS count FROM test')['count']);
-        $this->assertException(DatabaseException::class, function () use ($database) {
-            $database->insert('WRONG SQL');
-        });
 
         // Insert and get the last id
         $this->assertEquals(6, $database->insertGetId('INSERT INTO test (name, value) VALUES (?, ?)', ['Mug', -1]));
         $this->assertEquals(6, $connection->selectFirst('SELECT COUNT(*) AS count FROM test')['count']);
-        $this->assertException(DatabaseException::class, function () use ($database) {
-            $database->insertGetId('WRONG SQL');
-        });
 
         // Update
         $this->assertEquals(3, $database->update('UPDATE test SET name = name || ? WHERE value > ?', ['!', 100]));
@@ -105,9 +95,6 @@ class DatabaseTest extends TestCase
             ['name' =>'Orange!'],
             ['name' =>'Pillow!']
         ], $connection->select('SELECT name FROM test WHERE value > ? ORDER BY id', [100]));
-        $this->assertException(DatabaseException::class, function () use ($database) {
-            $database->update('WRONG SQL');
-        });
 
         // Delete
         $this->assertEquals(2, $database->delete('DELETE FROM test WHERE value < ?', [0]));
@@ -117,9 +104,6 @@ class DatabaseTest extends TestCase
             ['name' =>'Orange!'],
             ['name' =>'Pillow!']
         ], $connection->select('SELECT name FROM test ORDER BY id'));
-        $this->assertException(DatabaseException::class, function () use ($database) {
-            $database->delete('WRONG SQL');
-        });
 
         // Statement
         $database->statement('DROP TABLE test');
@@ -127,8 +111,30 @@ class DatabaseTest extends TestCase
             'SELECT name FROM sqlite_master WHERE type = ? AND name = ?',
             ['table', 'test'])
         );
-        $this->assertException(DatabaseException::class, function () use ($database) {
-            $database->statement('WRONG SQL');
+    }
+
+    /**
+     * Tests the methods creating builders
+     */
+    public function testCreateQuery()
+    {
+        $database = Database::create(['dns' => 'sqlite::memory:', 'prefix' => 'test_']);
+        $query = $database->table('items', 'i');
+        $this->assertEquals('test_items', $query->table);
+        $this->assertEquals('i', $query->tableAlias);
+
+        $this->assertException(InvalidArgumentException::class, function () use ($database) {
+            $database->table(['foo', 'bar']);
+        }, function (InvalidArgumentException $exception) {
+            $this->assertInstanceOf(QueryScribeInvalidArgumentException::class, $exception->getPrevious());
+        });
+
+        $this->assertException(InvalidArgumentException::class, function () use ($database) {
+            $database->table(function () {
+                return 'foo';
+            });
+        }, function (InvalidArgumentException $exception) {
+            $this->assertInstanceOf(QueryScribeInvalidReturnValueException::class, $exception->getPrevious());
         });
     }
 

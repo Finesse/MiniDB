@@ -9,10 +9,13 @@ use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\ExceptionInterface;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
 use Finesse\QueryScribe\AddTablePrefixTrait;
+use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
+use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInvalidReturnValueException;
 use Finesse\QueryScribe\GrammarInterface;
 use Finesse\QueryScribe\Grammars\CommonGrammar;
 use Finesse\QueryScribe\Grammars\MySQLGrammar;
 use Finesse\QueryScribe\MakeRawTrait;
+use Finesse\QueryScribe\StatementInterface;
 
 /**
  * Database facade.
@@ -69,8 +72,8 @@ class Database
                 $config['password'] ?? null,
                 $config['options'] ?? null
             );
-        } catch (\Throwable $exception) {
-            throw static::wrapException($exception);
+        } catch (ConnectionPDOException $exception) {
+            throw new DatabaseException($exception->getMessage(), $exception->getCode(), $exception);
         }
 
         switch (strtolower($config['driver'] ?? '')) {
@@ -85,6 +88,25 @@ class Database
     }
 
     /**
+     * Makes a query builder instance with a selected table.
+     *
+     * @param string|\Closure|Query|StatementInterface $table Not prefixed table name without quotes
+     * @param string|null $alias Table alias
+     * @return Query
+     * @throws InvalidArgumentException
+     */
+    public function table($table, string $alias = null): Query
+    {
+        try {
+            return (new Query($this))->table($table, $alias);
+        } catch (QueryScribeInvalidArgumentException $exception) {
+            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (QueryScribeInvalidReturnValueException $exception) {
+            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+    }
+
+    /**
      * Performs a select query and returns the query results.
      *
      * @param string $query Full SQL query (tables are not prefixed here)
@@ -95,11 +117,9 @@ class Database
      */
     public function select(string $query, array $values = []): array
     {
-        try {
+        return $this->performQuery(function () use ($query, $values) {
             return $this->connection->select($query, $values);
-        } catch (\Throwable $exception) {
-            throw static::wrapException($exception);
-        }
+        });
     }
 
     /**
@@ -113,11 +133,9 @@ class Database
      */
     public function selectFirst(string $query, array $values = [])
     {
-        try {
+        return $this->performQuery(function () use ($query, $values) {
             return $this->connection->selectFirst($query, $values);
-        } catch (\Throwable $exception) {
-            throw static::wrapException($exception);
-        }
+        });
     }
 
     /**
@@ -131,11 +149,9 @@ class Database
      */
     public function insert(string $query, array $values = []): int
     {
-        try {
+        return $this->performQuery(function () use ($query, $values) {
             return $this->connection->insert($query, $values);
-        } catch (\Throwable $exception) {
-            throw static::wrapException($exception);
-        }
+        });
     }
 
     /**
@@ -150,11 +166,9 @@ class Database
      */
     public function insertGetId(string $query, array $values = [], string $sequence = null)
     {
-        try {
+        return $this->performQuery(function () use ($query, $values, $sequence) {
             return $this->connection->insertGetId($query, $values, $sequence);
-        } catch (\Throwable $exception) {
-            throw static::wrapException($exception);
-        }
+        });
     }
 
     /**
@@ -168,11 +182,9 @@ class Database
      */
     public function update(string $query, array $values = []): int
     {
-        try {
+        return $this->performQuery(function () use ($query, $values) {
             return $this->connection->update($query, $values);
-        } catch (\Throwable $exception) {
-            throw static::wrapException($exception);
-        }
+        });
     }
 
     /**
@@ -186,11 +198,9 @@ class Database
      */
     public function delete(string $query, array $values = []): int
     {
-        try {
+        return $this->performQuery(function () use ($query, $values) {
             return $this->connection->delete($query, $values);
-        } catch (\Throwable $exception) {
-            throw static::wrapException($exception);
-        }
+        });
     }
 
     /**
@@ -203,11 +213,9 @@ class Database
      */
     public function statement(string $query, array $values = [])
     {
-        try {
+        $this->performQuery(function () use ($query, $values) {
             $this->connection->statement($query, $values);
-        } catch (\Throwable $exception) {
-            throw static::wrapException($exception);
-        }
+        });
     }
 
     /**
@@ -235,20 +243,20 @@ class Database
     }
 
     /**
-     * Converts an exception to a package exception (if possible).
+     * Performs a database query and handles exceptions.
      *
-     * @param \Throwable $exception
+     * @param \Closure $callback Function that performs the query
+     * @return mixed The $callback return value
      * @return ExceptionInterface|\Throwable
      */
-    protected static function wrapException(\Throwable $exception): \Throwable
+    protected function performQuery(\Closure $callback)
     {
-        if ($exception instanceof ConnectionPDOException) {
-            return new DatabaseException($exception->getMessage(), $exception->getCode(), $exception);
+        try {
+            return $callback();
+        } catch (ConnectionPDOException $exception) {
+            throw new DatabaseException($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (ConnectionInvalidArgumentException $exception) {
+            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
         }
-        if ($exception instanceof ConnectionInvalidArgumentException) {
-            return new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
-        }
-
-        return $exception;
     }
 }
