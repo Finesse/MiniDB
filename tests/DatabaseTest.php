@@ -143,6 +143,23 @@ class DatabaseTest extends TestCase
     }
 
     /**
+     * Tests the `with...` methods
+     */
+    public function testCopying()
+    {
+        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'foo-']);
+        $database2 = $database->withTablePrefix('bar-');
+        $this->assertEquals($database->getConnection(), $database2->getConnection());
+        $this->assertEquals($database->getGrammar(), $database2->getGrammar());
+        $this->assertEquals('bar-', $database2->getTablePrefix());
+
+        $database2 = $database->withTablesPrefixed('bar-');
+        $this->assertEquals($database->getConnection(), $database2->getConnection());
+        $this->assertEquals($database->getGrammar(), $database2->getGrammar());
+        $this->assertEquals('bar-foo-', $database2->getTablePrefix());
+    }
+
+    /**
      * Tests more error cases
      */
     public function testErrors()

@@ -21,7 +21,7 @@
 		"phpunit/phpunit": "^6.4",
 		"pagerfanta/pagerfanta": "^1.0"
 	},
-	"suggests": {
+	"suggest": {
 		"pagerfanta/pagerfanta": "For pagination"
 	},
 	"autoload": {

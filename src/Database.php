@@ -247,6 +247,31 @@ class Database
     }
 
     /**
+     * Makes a self copy with the same dependencies instances but with another table prefix.
+     *
+     * @param string $prefix Table prefix
+     * @return static
+     */
+    public function withTablePrefix(string $prefix): self
+    {
+        return new static($this->connection, $this->grammar, $prefix);
+    }
+
+    /**
+     * Makes a self copy with the same dependencies instances but with added table prefix.
+     *
+     * The table prefix is not replaced, it is prefixed. For example, if an instance table prefix is `demo_`, calling
+     * this method with the argument `test_` will make an instance with `test_demo_` table prefix.
+     *
+     * @param string $prefix Table prefix
+     * @return static
+     */
+    public function withTablesPrefixed(string $prefix): self
+    {
+        return new static($this->connection, $this->grammar, $prefix.$this->tablePrefix);
+    }
+
+    /**
      * Performs a database query and handles exceptions.
      *
      * @param \Closure $callback Function that performs the query
