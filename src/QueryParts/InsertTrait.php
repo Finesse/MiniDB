@@ -16,7 +16,7 @@ use Finesse\QueryScribe\StatementInterface;
 trait InsertTrait
 {
     /**
-     * Inserts rows to a table.
+     * Inserts rows to a table. Doesn't modify itself.
      *
      * @param mixed[][]|\Closure[][]|Query[][]|StatementInterface[][] $rows An array of rows. Each row is an associative
      *     array where indexes are column names and values are cell values. Rows indexes must be strings.
@@ -28,9 +28,9 @@ trait InsertTrait
     public function insert(array $rows): int
     {
         return $this->performQuery(function () use ($rows) {
-            $this->addInsert($rows);
+            $query = (clone $this)->addInsert($rows);
             $count = 0;
-            $statements = $this->database->getGrammar()->compileInsert($this);
+            $statements = $this->database->getGrammar()->compileInsert($query);
             foreach ($statements as $statement) {
                 $count += $this->database->insert($statement->getSQL(), $statement->getBindings());
             }
@@ -39,7 +39,7 @@ trait InsertTrait
     }
 
     /**
-     * Inserts a row to a table and returns the inserted row identifier.
+     * Inserts a row to a table and returns the inserted row identifier. Doesn't modify itself.
      *
      * @param mixed[]|\Closure[]|Query[]|StatementInterface[] $rows Row. Associative array where indexes are column
      *     names and values are cell values. Rows indexes must be strings.
@@ -52,8 +52,8 @@ trait InsertTrait
     public function insertGetId(array $row, string $sequence = null)
     {
         return $this->performQuery(function () use ($row, $sequence) {
-            $this->addInsert($row);
-            $statements = $this->database->getGrammar()->compileInsert($this);
+            $query = (clone $this)->addInsert([$row]);
+            $statements = $this->database->getGrammar()->compileInsert($query);
             $id = null;
             foreach ($statements as $statement) {
                 $id = $this->database->insertGetId($statement->getSQL(), $statement->getBindings(), $sequence);
@@ -63,7 +63,7 @@ trait InsertTrait
     }
 
     /**
-     * Inserts rows to a table from a select query.
+     * Inserts rows to a table from a select query. Doesn't modify itself.
      *
      * @param string[]|\Closure|Query|StatementInterface $columns The list of the columns to which the selected values
      *     should be inserted. You may omit this argument and pass the $selectQuery argument instead.
@@ -76,8 +76,7 @@ trait InsertTrait
     public function insertFromSelect($columns, $selectQuery = null): int
     {
         return $this->performQuery(function () use ($columns, $selectQuery) {
-            $this->addInsertFromSelect($columns, $selectQuery);
-            return $this->insert([]);
+            return (clone $this)->addInsertFromSelect($columns, $selectQuery)->insert([]);
         });
     }
 }

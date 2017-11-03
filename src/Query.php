@@ -45,7 +45,7 @@ class Query extends BaseQuery
     }
 
     /**
-     * Updates the query target rows.
+     * Updates the query target rows. Doesn't modify itself.
      *
      * @param mixed[]|\Closure[]|self[]|StatementInterface[] $values Fields to update. The indexes are the columns
      *     names, the values are the values.
@@ -57,14 +57,14 @@ class Query extends BaseQuery
     public function update(array $values): int
     {
         return $this->performQuery(function () use ($values) {
-            $this->addUpdate($values);
-            $compiled = $this->database->getGrammar()->compileUpdate($this);
+            $query = (clone $this)->addUpdate($values);
+            $compiled = $this->database->getGrammar()->compileUpdate($query);
             return $this->database->update($compiled->getSQL(), $compiled->getBindings());
         });
     }
 
     /**
-     * Deletes the query target rows.
+     * Deletes the query target rows. Doesn't modify itself.
      *
      * @return int The number of deleted rows
      * @throws DatabaseException
@@ -74,8 +74,8 @@ class Query extends BaseQuery
     public function delete(): int
     {
         return $this->performQuery(function () {
-            $this->setDelete();
-            $compiled = $this->database->getGrammar()->compileDelete($this);
+            $query = (clone $this)->setDelete();
+            $compiled = $this->database->getGrammar()->compileDelete($query);
             return $this->database->delete($compiled->getSQL(), $compiled->getBindings());
         });
     }

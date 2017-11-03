@@ -18,7 +18,11 @@
 	},
 	"require-dev": {
 		"ext-pdo_sqlite": "*",
-		"phpunit/phpunit": "^6.4"
+		"phpunit/phpunit": "^6.4",
+		"pagerfanta/pagerfanta": "^1.0"
+	},
+	"suggests": {
+		"pagerfanta/pagerfanta": "For pagination"
 	},
 	"autoload": {
 		"psr-4": {
