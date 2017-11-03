@@ -13,7 +13,7 @@
 	],
 	"require": {
 		"php": ">=7.0",
-		"finesse/micro-db": "^0.2.0",
+		"finesse/micro-db": "dev-master",
 		"finesse/query-scribe": "^0.2.0"
 	},
 	"require-dev": {
