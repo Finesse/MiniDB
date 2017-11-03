@@ -176,7 +176,7 @@ class Database
     }
 
     /**
-     * Performs a update query.
+     * Performs an update query.
      *
      * @param string $query Full SQL query (tables are not prefixed here)
      * @param array $values Values to bind. The indexes are the names or numbers of the values.

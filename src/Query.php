@@ -2,6 +2,7 @@
 
 namespace Finesse\MiniDB;
 
+use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\ExceptionInterface;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
@@ -10,6 +11,7 @@ use Finesse\MiniDB\QueryParts\SelectTrait;
 use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
 use Finesse\QueryScribe\Exceptions\InvalidQueryException as QueryScribeInvalidQueryException;
 use Finesse\QueryScribe\Query as BaseQuery;
+use Finesse\QueryScribe\StatementInterface;
 
 /**
  * Query builder. Builds SQL queries and performs them on a database.
@@ -40,6 +42,42 @@ class Query extends BaseQuery
     public function makeEmptyCopy(): BaseQuery
     {
         return new static($this->database);
+    }
+
+    /**
+     * Updates the query target rows.
+     *
+     * @param mixed[]|\Closure[]|self[]|StatementInterface[] $values Fields to update. The indexes are the columns
+     *     names, the values are the values.
+     * @return int The number of updated rows
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
+     * @throws InvalidArgumentException
+     */
+    public function update(array $values): int
+    {
+        return $this->performQuery(function () use ($values) {
+            $this->addUpdate($values);
+            $compiled = $this->database->getGrammar()->compileUpdate($this);
+            return $this->database->update($compiled->getSQL(), $compiled->getBindings());
+        });
+    }
+
+    /**
+     * Deletes the query target rows.
+     *
+     * @return int The number of deleted rows
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
+     * @throws InvalidArgumentException
+     */
+    public function delete(): int
+    {
+        return $this->performQuery(function () {
+            $this->setDelete();
+            $compiled = $this->database->getGrammar()->compileDelete($this);
+            return $this->database->delete($compiled->getSQL(), $compiled->getBindings());
+        });
     }
 
     /**
