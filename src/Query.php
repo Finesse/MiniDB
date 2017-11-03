@@ -2,6 +2,7 @@
 
 namespace Finesse\MiniDB;
 
+use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\ExceptionInterface;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
@@ -43,7 +44,8 @@ class Query extends BaseQuery
      * Performs a select query and returns the selected rows.
      *
      * @return array[] Array of the result rows. Result row is an array indexed by columns.
-     * @throws ExceptionInterface
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
      */
     public function get(): array
     {
@@ -57,7 +59,8 @@ class Query extends BaseQuery
      * Performs a select query and returns the first selected row.
      *
      * @return array|null An array indexed by columns. Null if nothing is found.
-     * @throws ExceptionInterface
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
      */
     public function first()
     {
@@ -73,6 +76,9 @@ class Query extends BaseQuery
      *
      * @param string|\Closure|self|StatementInterface $column Column to count
      * @return int
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
+     * @throws InvalidArgumentException
      */
     public function count($column = '*'): int
     {
@@ -89,6 +95,9 @@ class Query extends BaseQuery
      *
      * @param string|\Closure|self|StatementInterface $column Column to get average
      * @return float|null Null is returned when no target row has a value
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
+     * @throws InvalidArgumentException
      */
     public function avg($column)
     {
@@ -105,6 +114,9 @@ class Query extends BaseQuery
      *
      * @param string|\Closure|self|StatementInterface $column Column to get sum
      * @return float|null Null is returned when no target row has a value
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
+     * @throws InvalidArgumentException
      */
     public function sum($column)
     {
@@ -121,6 +133,9 @@ class Query extends BaseQuery
      *
      * @param string|\Closure|self|StatementInterface $column Column to get minimum
      * @return float|null Null is returned when no target row has a value
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
+     * @throws InvalidArgumentException
      */
     public function min($column)
     {
@@ -137,6 +152,9 @@ class Query extends BaseQuery
      *
      * @param string|\Closure|self|StatementInterface $column Column to get maximum
      * @return float|null Null is returned when no target row has a value
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
+     * @throws InvalidArgumentException
      */
     public function max($column)
     {
@@ -146,6 +164,35 @@ class Query extends BaseQuery
             $compiled = $this->database->getGrammar()->compileSelect($this);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         });
+    }
+
+    /**
+     * Walks large amount of rows calling a callback on small portions of rows.
+     *
+     * @param int $size Number of rows per callback call
+     * @param callable $callback The callback. Receives an array of rows as the first argument.
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
+     * @throws InvalidArgumentException
+     */
+    public function chunk(int $size, callable $callback)
+    {
+        if ($size <= 0) {
+            throw new InvalidArgumentException('Chunk size must be greater than zero');
+        }
+
+        for ($offset = 0;; $offset += $size) {
+            $rows = $this->offset($offset)->limit($size)->get();
+            if (empty($rows)) {
+                break;
+            }
+
+            $callback($rows);
+
+            if (count($rows) < $size) {
+                break;
+            }
+        }
     }
 
     /**

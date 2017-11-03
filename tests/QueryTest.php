@@ -110,16 +110,50 @@ class QueryTest extends TestCase
     }
 
     /**
+     * Tests the `chunk` method
+     */
+    public function testChunk()
+    {
+        $database = Database::create(['dns' => 'sqlite::memory:', 'prefix' => 'pre_']);
+        $database->statement('CREATE TABLE pre_items(id INTEGER PRIMARY KEY ASC, name TEXT, value NUMERIC)');
+        for ($i = 0; $i < 113; ++$i) {
+            $database->insert('INSERT INTO pre_items (name, value) VALUES (?, ?)', ['Item '.$i, ($i % 10) * 10]);
+        }
+
+        // Ordinary
+        $callsCount = 0;
+        $database->table('items')->orderBy('id')->chunk(10, function ($rows) use (&$callsCount) {
+            ++$callsCount;
+            $this->assertInternalType('array', $rows);
+            $this->assertCount($callsCount === 12 ? 3 : 10, $rows);
+        });
+        $this->assertEquals(12, $callsCount);
+
+        // No rows
+        $callsCount = 0;
+        $database
+            ->table('items')
+            ->where('name', 'Super')
+            ->orderBy('id')
+            ->chunk(10, function () use (&$callsCount) {
+                ++$callsCount;
+            });
+        $this->assertEquals(0, $callsCount);
+
+        $this->assertException(InvalidArgumentException::class, function () use ($database) {
+            $database->table('items')->orderBy('id')->chunk(-10, function () {});
+        });
+    }
+
+    /**
      * Tests more error cases
      */
     public function testErrors()
     {
         $database = Database::create(['dns' => 'sqlite::memory:', 'prefix' => 'pre_']);
 
-        $query = $database->table('animals');
-        $query->table = null;
-        $this->assertException(IncorrectQueryException::class, function () use ($query) {
-            $query->get();
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            $database->table('animals')->offset(10)->get();
         }, function (IncorrectQueryException $exception) {
             $this->assertInstanceOf(QueryScribeInvalidQueryException::class, $exception->getPrevious());
         });
