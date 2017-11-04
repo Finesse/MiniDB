@@ -13,8 +13,8 @@
 	],
 	"require": {
 		"php": ">=7.0",
-		"finesse/micro-db": "dev-master",
-		"finesse/query-scribe": "dev-master"
+		"finesse/micro-db": "^0.2.1",
+		"finesse/query-scribe": "^0.3.0"
 	},
 	"require-dev": {
 		"ext-pdo_sqlite": "*",
