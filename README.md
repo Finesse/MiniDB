@@ -249,6 +249,7 @@ $query = $database
     ->table('posts')
     ->where('category', 'archive')
     ->orderBy('date', 'desc');
+    // Don't call ->get() here
 ```
 
 And use Pagerfanta:
@@ -257,7 +258,7 @@ And use Pagerfanta:
 use Finesse\MiniDB\ThirdParty\PagerfantaAdapter;
 use Pagerfanta\Pagerfanta;
 
-$paginator = new Pagerfanta(PagerfantaAdapter($query));
+$paginator = new Pagerfanta(new PagerfantaAdapter($query));
 $paginator->setMaxPerPage(20); // 10 by default
 $paginator->setCurrentPage(3); // 1 by default
 
