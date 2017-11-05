@@ -43,6 +43,7 @@ Key features:
   [database connector](https://github.com/FinesseRus/MicroDB) may be used separately.
 * Supports table prefixes.
 * No static facades. Explicit delivery using dependency injection. 
+* Exceptions on errors.
 
 Supported DBMSs:
 
@@ -90,12 +91,13 @@ Alternatively you may create all the dependencies manually:
 use Finesse\MicroDB\Connection;
 use Finesse\MiniDB\Database;
 use Finesse\QueryScribe\Grammars\MySQLGrammar;
+use Finesse\QueryScribe\PostProcessors\TablePrefixer;
 
 $connection = Connection::create('mysql:host=host;dbname=db', 'username', 'password');
 $grammar = new MySQLGrammar();
-$tablePrefix = 'demo_';
+$tablePrefixer = new TablePrefixer('demo_');
 
-$database = new Database($connection, $grammar, $tablePrefix);
+$database = new Database($connection, $grammar, $tablePrefixer);
 ```
 
 ### Raw SQL queries
@@ -234,7 +236,7 @@ $database
 
 #### Pagination
 
-We suggest to use [Pagerfanta](https://github.com/whiteoctober/Pagerfanta) to make easy pagination.
+We suggest [Pagerfanta](https://github.com/whiteoctober/Pagerfanta) to easily make pagination.
 
 First install Pagerfanta using [composer](https://getcomposer.org) by running in a console:
 
@@ -259,8 +261,8 @@ use Finesse\MiniDB\ThirdParty\PagerfantaAdapter;
 use Pagerfanta\Pagerfanta;
 
 $paginator = new Pagerfanta(new PagerfantaAdapter($query));
-$paginator->setMaxPerPage(20); // 10 by default
-$paginator->setCurrentPage(3); // 1 by default
+$paginator->setMaxPerPage(10); // The number of rows on a page
+$paginator->setCurrentPage(3); // The current page number
 
 $currentPageRows = $paginator->getCurrentPageResults(); // The rows for the current page
 $pagesCount = $paginator->getNbPages();                 // Total pages count

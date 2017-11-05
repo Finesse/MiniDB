@@ -30,6 +30,7 @@ trait InsertTrait
         return $this->performQuery(function () use ($rows) {
             $query = (clone $this)->addInsert($rows);
             $count = 0;
+            $query = $this->database->getTablePrefixer()->process($query);
             $statements = $this->database->getGrammar()->compileInsert($query);
             foreach ($statements as $statement) {
                 $count += $this->database->insert($statement->getSQL(), $statement->getBindings());
@@ -53,6 +54,7 @@ trait InsertTrait
     {
         return $this->performQuery(function () use ($row, $sequence) {
             $query = (clone $this)->addInsert([$row]);
+            $query = $this->database->getTablePrefixer()->process($query);
             $statements = $this->database->getGrammar()->compileInsert($query);
             $id = null;
             foreach ($statements as $statement) {

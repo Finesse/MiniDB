@@ -14,7 +14,7 @@
 	"require": {
 		"php": ">=7.0",
 		"finesse/micro-db": "^0.2.1",
-		"finesse/query-scribe": "^0.3.0"
+		"finesse/query-scribe": "^0.4.0"
 	},
 	"require-dev": {
 		"ext-pdo_sqlite": "*",
@@ -22,7 +22,7 @@
 		"pagerfanta/pagerfanta": "^1.0"
 	},
 	"suggest": {
-		"pagerfanta/pagerfanta": "For pagination"
+		"pagerfanta/pagerfanta": "To make pagination"
 	},
 	"autoload": {
 		"psr-4": {

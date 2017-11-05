@@ -32,7 +32,6 @@ class Query extends BaseQuery
      */
     public function __construct(Database $database)
     {
-        parent::__construct($database->getTablePrefix());
         $this->database = $database;
     }
 
@@ -58,6 +57,7 @@ class Query extends BaseQuery
     {
         return $this->performQuery(function () use ($values) {
             $query = (clone $this)->addUpdate($values);
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileUpdate($query);
             return $this->database->update($compiled->getSQL(), $compiled->getBindings());
         });
@@ -75,6 +75,7 @@ class Query extends BaseQuery
     {
         return $this->performQuery(function () {
             $query = (clone $this)->setDelete();
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileDelete($query);
             return $this->database->delete($compiled->getSQL(), $compiled->getBindings());
         });

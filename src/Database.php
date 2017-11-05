@@ -8,7 +8,6 @@ use Finesse\MicroDB\Exceptions\PDOException as ConnectionPDOException;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\ExceptionInterface;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
-use Finesse\QueryScribe\AddTablePrefixTrait;
 use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
 use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInvalidReturnValueException;
 use Finesse\QueryScribe\GrammarInterface;
@@ -16,6 +15,7 @@ use Finesse\QueryScribe\Grammars\CommonGrammar;
 use Finesse\QueryScribe\Grammars\MySQLGrammar;
 use Finesse\QueryScribe\Grammars\SQLiteGrammar;
 use Finesse\QueryScribe\MakeRawTrait;
+use Finesse\QueryScribe\PostProcessors\TablePrefixer;
 use Finesse\QueryScribe\StatementInterface;
 
 /**
@@ -25,7 +25,7 @@ use Finesse\QueryScribe\StatementInterface;
  */
 class Database
 {
-    use AddTablePrefixTrait, MakeRawTrait;
+    use MakeRawTrait;
 
     /**
      * @var Connection Database connection
@@ -38,17 +38,25 @@ class Database
     protected $grammar;
 
     /**
+     * @var TablePrefixer Table prefixer
+     */
+    protected $tablePrefixer;
+
+    /**
      * The object doesn't change any given object.
      *
      * @param Connection $connection Database connection
      * @param GrammarInterface|null $grammar Grammar (compiles queries to SQL)
-     * @param string $tablePrefix Tables prefix (not prepended in raw SQL queries)
+     * @param TablePrefixer $tablePrefixer Tables prefixer (prefixes are not prepended in raw SQL queries)
      */
-    public function __construct(Connection $connection, GrammarInterface $grammar = null, string $tablePrefix = '')
-    {
+    public function __construct(
+        Connection $connection,
+        GrammarInterface $grammar = null,
+        TablePrefixer $tablePrefixer = null
+    ) {
         $this->connection = $connection;
         $this->grammar = $grammar ?? new CommonGrammar();
-        $this->tablePrefix = $tablePrefix;
+        $this->tablePrefixer = $tablePrefixer ?? new TablePrefixer('');
     }
 
     /**
@@ -88,7 +96,7 @@ class Database
                 $grammar = null;
         }
 
-        return new static($connection, $grammar, $config['prefix'] ?? '');
+        return new static($connection, $grammar, new TablePrefixer($config['prefix'] ?? ''));
     }
 
     /**
@@ -223,6 +231,28 @@ class Database
     }
 
     /**
+     * Adds the table prefix to a table name.
+     *
+     * @param string $table Table name without quotes
+     * @return string Table name with prefix
+     */
+    public function addTablePrefix(string $table): string
+    {
+        return $this->tablePrefixer->addTablePrefix($table);
+    }
+
+    /**
+     * Adds the table prefix to a column name which may contain table name or alias.
+     *
+     * @param string $column Column name without quotes
+     * @return string Column name with prefixed table name
+     */
+    public function addTablePrefixToColumn(string $column): string
+    {
+        return $this->tablePrefixer->addTablePrefixToColumn($column);
+    }
+
+    /**
      * @return Connection Underlying connection
      */
     public function getConnection(): Connection
@@ -239,11 +269,11 @@ class Database
     }
 
     /**
-     * @return string Tables prefix
+     * @return TablePrefixer Tables prefixer
      */
-    public function getTablePrefix(): string
+    public function getTablePrefixer(): TablePrefixer
     {
-        return $this->tablePrefix;
+        return $this->tablePrefixer;
     }
 
     /**
@@ -254,7 +284,7 @@ class Database
      */
     public function withTablePrefix(string $prefix): self
     {
-        return new static($this->connection, $this->grammar, $prefix);
+        return new static($this->connection, $this->grammar, new TablePrefixer($prefix));
     }
 
     /**
@@ -268,7 +298,11 @@ class Database
      */
     public function withTablesPrefixed(string $prefix): self
     {
-        return new static($this->connection, $this->grammar, $prefix.$this->tablePrefix);
+        return new static(
+            $this->connection,
+            $this->grammar,
+            new TablePrefixer($prefix.$this->tablePrefixer->tablePrefix)
+        );
     }
 
     /**

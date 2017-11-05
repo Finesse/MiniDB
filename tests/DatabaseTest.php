@@ -31,7 +31,7 @@ class DatabaseTest extends TestCase
         ]);
         $this->assertInstanceOf(Connection::class, $database->getConnection());
         $this->assertInstanceOf(CommonGrammar::class, $database->getGrammar());
-        $this->assertEquals('', $database->getTablePrefix());
+        $this->assertEquals('', $database->getTablePrefixer()->tablePrefix);
 
         $database = Database::create([
             'driver' => 'SQLite',
@@ -43,7 +43,7 @@ class DatabaseTest extends TestCase
         ]);
         $this->assertInstanceOf(Connection::class, $database->getConnection());
         $this->assertInstanceOf(SQLiteGrammar::class, $database->getGrammar());
-        $this->assertEquals('test_', $database->getTablePrefix());
+        $this->assertEquals('test_', $database->getTablePrefixer()->tablePrefix);
 
         $database = Database::create(['driver' => 'MySQL', 'dns' => 'sqlite::memory:']);
         $this->assertInstanceOf(MySQLGrammar::class, $database->getGrammar());
@@ -124,7 +124,7 @@ class DatabaseTest extends TestCase
     {
         $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'test_']);
         $query = $database->table('items', 'i');
-        $this->assertEquals('test_items', $query->table);
+        $this->assertEquals('items', $query->table);
         $this->assertEquals('i', $query->tableAlias);
 
         $this->assertException(InvalidArgumentException::class, function () use ($database) {
@@ -151,12 +151,29 @@ class DatabaseTest extends TestCase
         $database2 = $database->withTablePrefix('bar-');
         $this->assertEquals($database->getConnection(), $database2->getConnection());
         $this->assertEquals($database->getGrammar(), $database2->getGrammar());
-        $this->assertEquals('bar-', $database2->getTablePrefix());
+        $this->assertEquals('bar-', $database2->getTablePrefixer()->tablePrefix);
+        $this->assertEquals('foo-', $database->getTablePrefixer()->tablePrefix);
 
         $database2 = $database->withTablesPrefixed('bar-');
         $this->assertEquals($database->getConnection(), $database2->getConnection());
         $this->assertEquals($database->getGrammar(), $database2->getGrammar());
-        $this->assertEquals('bar-foo-', $database2->getTablePrefix());
+        $this->assertEquals('bar-foo-', $database2->getTablePrefixer()->tablePrefix);;
+        $this->assertEquals('foo-', $database->getTablePrefixer()->tablePrefix);
+    }
+
+    /**
+     * Tests the `addTablePrefix` and `addTablePrefixToColumn` methods
+     */
+    public function testAddTablePrefix()
+    {
+        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'prefix_']);
+
+        $this->assertEquals('prefix_tab1', $database->addTablePrefix('tab1'));
+        $this->assertEquals('database.prefix_table', $database->addTablePrefix('database.table'));
+
+        $this->assertEquals('column1', $database->addTablePrefixToColumn('column1'));
+        $this->assertEquals('prefix_table.column1', $database->addTablePrefixToColumn('table.column1'));
+        $this->assertEquals('database.prefix_table.column1', $database->addTablePrefixToColumn('database.table.column1'));
     }
 
     /**

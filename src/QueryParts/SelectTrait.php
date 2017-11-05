@@ -24,7 +24,8 @@ trait SelectTrait
     public function get(): array
     {
         return $this->performQuery(function () {
-            $compiled = $this->database->getGrammar()->compileSelect($this);
+            $query = $this->database->getTablePrefixer()->process($this);
+            $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->select($compiled->getSQL(), $compiled->getBindings());
         });
     }
@@ -40,6 +41,7 @@ trait SelectTrait
     {
         return $this->performQuery(function () {
             $query = (clone $this)->limit(1);
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings());
         });
@@ -60,6 +62,7 @@ trait SelectTrait
             $query = clone $this;
             $query->select = [];
             $query->addCount($column, 'aggregate')->offset(null)->limit(null);
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         });
@@ -80,6 +83,7 @@ trait SelectTrait
             $query = clone $this;
             $query->select = [];
             $query->addAvg($column, 'aggregate')->offset(null)->limit(null);
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         });
@@ -100,6 +104,7 @@ trait SelectTrait
             $query = clone $this;
             $query->select = [];
             $query->addSum($column, 'aggregate')->offset(null)->limit(null);
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         });
@@ -120,6 +125,7 @@ trait SelectTrait
             $query = clone $this;
             $query->select = [];
             $query->addMin($column, 'aggregate')->offset(null)->limit(null);
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         });
@@ -140,6 +146,7 @@ trait SelectTrait
             $query = clone $this;
             $query->select = [];
             $query->addMax($column, 'aggregate')->offset(null)->limit(null);
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         });
