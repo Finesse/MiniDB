@@ -27,7 +27,7 @@ class DatabaseTest extends TestCase
     public function testCreate()
     {
         $database = Database::create([
-            'dns' => 'sqlite::memory:'
+            'dsn' => 'sqlite::memory:'
         ]);
         $this->assertInstanceOf(Connection::class, $database->getConnection());
         $this->assertInstanceOf(CommonGrammar::class, $database->getGrammar());
@@ -35,7 +35,7 @@ class DatabaseTest extends TestCase
 
         $database = Database::create([
             'driver' => 'SQLite',
-            'dns' => 'sqlite::memory:',
+            'dsn' => 'sqlite::memory:',
             'username' => null,
             'password' => null,
             'options' => null,
@@ -45,12 +45,12 @@ class DatabaseTest extends TestCase
         $this->assertInstanceOf(SQLiteGrammar::class, $database->getGrammar());
         $this->assertEquals('test_', $database->getTablePrefixer()->tablePrefix);
 
-        $database = Database::create(['driver' => 'MySQL', 'dns' => 'sqlite::memory:']);
+        $database = Database::create(['driver' => 'MySQL', 'dsn' => 'sqlite::memory:']);
         $this->assertInstanceOf(MySQLGrammar::class, $database->getGrammar());
 
         $this->assertException(DatabaseException::class, function () {
             Database::create([
-                'dns' => 'foo:bar'
+                'dsn' => 'foo:bar'
             ]);
         });
     }
@@ -122,7 +122,7 @@ class DatabaseTest extends TestCase
      */
     public function testCreateQuery()
     {
-        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'test_']);
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'test_']);
         $query = $database->table('items', 'i');
         $this->assertEquals('items', $query->table);
         $this->assertEquals('i', $query->tableAlias);
@@ -147,7 +147,7 @@ class DatabaseTest extends TestCase
      */
     public function testCopying()
     {
-        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'foo-']);
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'foo-']);
         $database2 = $database->withTablePrefix('bar-');
         $this->assertEquals($database->getConnection(), $database2->getConnection());
         $this->assertEquals($database->getGrammar(), $database2->getGrammar());
@@ -166,7 +166,7 @@ class DatabaseTest extends TestCase
      */
     public function testAddTablePrefix()
     {
-        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'prefix_']);
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'prefix_']);
 
         $this->assertEquals('prefix_tab1', $database->addTablePrefix('tab1'));
         $this->assertEquals('database.prefix_table', $database->addTablePrefix('database.table'));
@@ -181,7 +181,7 @@ class DatabaseTest extends TestCase
      */
     public function testErrors()
     {
-        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:']);
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:']);
 
         // Wrapping Connection PDOException
         $this->assertException(DatabaseException::class, function () use ($database) {

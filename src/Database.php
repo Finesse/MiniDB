@@ -62,21 +62,21 @@ class Database
     /**
      * Makes a self instance from a configuration array. Parameters:
      *  * driver (optional) - DB driver name (for example, `mysql`, `sqlite`);
-     *  * dns - PDO dns string;
+     *  * dsn - PDO data source name (DSN);
      *  * username (optional) - PDO username;
      *  * password (optional) - PDO password;
      *  * options (options) - array of options for PDO;
      *  * prefix (optional) - tables prefix (not prepended in raw SQL queries)
      *
      * @param array $config
-     * @return self
+     * @return static
      * @throws DatabaseException
      */
     public static function create(array $config): self
     {
         try {
             $connection = Connection::create(
-                $config['dns'] ?? '',
+                $config['dsn'] ?? '',
                 $config['username'] ?? null,
                 $config['password'] ?? null,
                 $config['options'] ?? null
@@ -103,7 +103,8 @@ class Database
      * Makes a query builder instance with a selected table.
      *
      * @param string|\Closure|Query|StatementInterface $table Not prefixed table name without quotes
-     * @param string|null $alias Table alias
+     * @param string|null $alias Table alias. Warning! Alias is not allowed in insert, update and delete queries in some
+     *     of the DBMSs.
      * @return Query
      * @throws InvalidArgumentException
      */

@@ -19,7 +19,7 @@ class QueryTest extends TestCase
      */
     public function testUpdate()
     {
-        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'pre_']);
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'pre_']);
         $database->statement('CREATE TABLE '.$database->addTablePrefix('items')
             . '(id INTEGER PRIMARY KEY ASC, name TEXT, value NUMERIC)');
         $database->insert(
@@ -47,7 +47,7 @@ class QueryTest extends TestCase
      */
     public function testDelete()
     {
-        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'pre_']);
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'pre_']);
         $database->statement('CREATE TABLE '.$database->addTablePrefix('items')
             . '(id INTEGER PRIMARY KEY ASC, name TEXT, value NUMERIC)');
         $database->insert(
@@ -71,7 +71,7 @@ class QueryTest extends TestCase
      */
     public function testErrors()
     {
-        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'pre_']);
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'pre_']);
 
         $this->assertException(IncorrectQueryException::class, function () use ($database) {
             $database->table('animals')->offset(10)->get();

@@ -18,7 +18,7 @@ class PagerfantaAdapterTest extends TestCase
      */
     public function testAdapter()
     {
-        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'pre_']);
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'pre_']);
         $database->statement('CREATE TABLE pre_items(id INTEGER PRIMARY KEY ASC, name TEXT)');
         for ($i = 0; $i < 58; ++$i) {
             $database->insert('INSERT INTO pre_items (name) VALUES (?)', ['Item '.$i]);

@@ -17,7 +17,7 @@ class InsertTraitTest extends TestCase
      */
     public function testInsert()
     {
-        $database = Database::create(['driver' => 'sqlite', 'dns' => 'sqlite::memory:', 'prefix' => 'test_']);
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'test_']);
         $database->statement('CREATE TABLE '.$database->addTablePrefix('users')
             . '(id INTEGER PRIMARY KEY ASC, name TEXT, address TEXT)');
 

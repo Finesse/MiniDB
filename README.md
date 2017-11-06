@@ -13,7 +13,7 @@ syntax and an interface for performing pure SQL queries.
 ```php
 $database = Database::create([
     'driver' => 'mysql',
-    'dns' => 'mysql:host=localhost;dbname=my_database',
+    'dsn' => 'mysql:host=localhost;dbname=my_database',
     'username' => 'root',
     'password' => 'qwerty',
     'prefix' => 'test_'
@@ -39,7 +39,7 @@ $database->table('users')->where('account', '>', 600)->get(); // Jack and Richar
 Key features:
 
 * Light with a small number of light dependencies.
-* The [query builder](https://coveralls.io/github/FinesseRus/QueryScribe) and the 
+* The [query builder](https://github.com/FinesseRus/QueryScribe) and the 
   [database connector](https://github.com/FinesseRus/MicroDB) may be used separately.
 * Supports table prefixes.
 * No static facades. Explicit delivery using dependency injection. 
@@ -75,7 +75,7 @@ use Finesse\MiniDB\Database;
 
 $database = Database::create([
     'driver'   => 'mysql',                     // DBMS type: 'mysql', 'sqlite' or anything else for other (optional) 
-    'dns'      => 'mysql:host=host;dbname=db', // PDO DNS string
+    'dsn'      => 'mysql:host=host;dbname=db', // PDO data source name (DSN)
     'username' => 'root',                      // Database username (optional)
     'password' => 'qwerty',                    // Database password (optional)
     'options'  => [],                          // PDO options (optional)
