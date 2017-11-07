@@ -45,6 +45,9 @@ class QueryProxyTest extends TestCase
         $superQuery->whereNotNull('value')->orderBy('id', 'desc');
         $this->assertEquals(['4|Bottle|0', '2|Apple|-10', '1|Banana|123'], $superQuery->get());
         $this->assertEquals('4|Bottle|0', $superQuery->first());
+
+        // Null result
+        $this->assertNull($superQuery->where('name', 'Orange')->first());
     }
 
     /**

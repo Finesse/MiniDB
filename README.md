@@ -85,7 +85,7 @@ $database = Database::create([
 
 See more about the PDO options at the [PDO constructor reference](http://php.net/manual/en/pdo.construct.php).
 
-Alternatively you may create all the dependencies manually:
+Alternatively you can create all the dependencies manually:
 
 ```php
 use Finesse\MicroDB\Connection;
@@ -113,6 +113,9 @@ $database->select('SELECT * FROM users WHERE name = ? OR email = ?', ['Jack', 'j
     ]
  */
 ```
+
+The cell values are returned as they are returned by the underlying database connection. They are not casted 
+automatically because casting can cause data loss.
 
 Table prefix is not applied in raw queries. Use `$database->addTablePrefix()` to apply it.
 

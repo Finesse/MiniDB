@@ -42,7 +42,11 @@ class QueryProxy extends BaseQueryProxy
             return $this->handleBaseQueryException($exception);
         }
 
-        return $this->processFetchedRow($row);
+        if ($row === null) {
+            return $row;
+        } else {
+            return $this->processFetchedRow($row);
+        }
     }
 
     /**
