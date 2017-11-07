@@ -2,6 +2,8 @@
 
 namespace Finesse\MiniDB\ThirdParty;
 
+use Finesse\MiniDB\Exceptions\DatabaseException;
+use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Query;
 use Pagerfanta\Adapter\AdapterInterface;
 
@@ -28,6 +30,8 @@ class PagerfantaAdapter implements AdapterInterface
 
     /**
      * {@inheritDoc}
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
      */
     public function getNbResults()
     {
@@ -36,6 +40,9 @@ class PagerfantaAdapter implements AdapterInterface
 
     /**
      * {@inheritDoc}
+     * @return array[]
+     * @throws DatabaseException
+     * @throws IncorrectQueryException
      */
     public function getSlice($offset, $length)
     {
