@@ -167,6 +167,22 @@ $database
  */
 ```
 
+##### Chunking rows
+
+If you need to process a large amount of rows you can use chunking. In this approach portions of rows are fetched from 
+the database instead of fetching all the rows at once.
+
+```php
+$database
+    ->table('users')
+    ->orderBy('id')
+    ->chunk(100, function ($users) {
+        foreach ($users as $user) {
+            // Process a row here
+        }
+    });
+```
+
 #### Aggregates
 
 ```php
