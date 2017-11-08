@@ -6,6 +6,7 @@ use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
 use Finesse\MiniDB\Query;
+use Finesse\QueryScribe\Exceptions\InvalidQueryException as QueryScribeInvalidQueryException;
 use Finesse\QueryScribe\StatementInterface;
 
 /**
@@ -27,16 +28,21 @@ trait InsertTrait
      */
     public function insert(array $rows): int
     {
-        return $this->performQuery(function () use ($rows) {
-            $query = (clone $this)->addInsert($rows);
-            $count = 0;
-            $query = $this->database->getTablePrefixer()->process($query);
+        $query = (clone $this)->addInsert($rows);
+        $count = 0;
+        $query = $this->database->getTablePrefixer()->process($query);
+
+        try {
             $statements = $this->database->getGrammar()->compileInsert($query);
-            foreach ($statements as $statement) {
-                $count += $this->database->insert($statement->getSQL(), $statement->getBindings());
-            }
-            return $count;
-        });
+        } catch (QueryScribeInvalidQueryException $exception) {
+            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        foreach ($statements as $statement) {
+            $count += $this->database->insert($statement->getSQL(), $statement->getBindings());
+        }
+
+        return $count;
     }
 
     /**
@@ -52,16 +58,21 @@ trait InsertTrait
      */
     public function insertGetId(array $row, string $sequence = null)
     {
-        return $this->performQuery(function () use ($row, $sequence) {
-            $query = (clone $this)->addInsert([$row]);
-            $query = $this->database->getTablePrefixer()->process($query);
+        $query = (clone $this)->addInsert([$row]);
+        $query = $this->database->getTablePrefixer()->process($query);
+
+        try {
             $statements = $this->database->getGrammar()->compileInsert($query);
-            $id = null;
-            foreach ($statements as $statement) {
-                $id = $this->database->insertGetId($statement->getSQL(), $statement->getBindings(), $sequence);
-            }
-            return $id;
-        });
+        } catch (QueryScribeInvalidQueryException $exception) {
+            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        $id = null;
+        foreach ($statements as $statement) {
+            $id = $this->database->insertGetId($statement->getSQL(), $statement->getBindings(), $sequence);
+        }
+
+        return $id;
     }
 
     /**
@@ -77,8 +88,6 @@ trait InsertTrait
      */
     public function insertFromSelect($columns, $selectQuery = null): int
     {
-        return $this->performQuery(function () use ($columns, $selectQuery) {
-            return (clone $this)->addInsertFromSelect($columns, $selectQuery)->insert([]);
-        });
+        return (clone $this)->addInsertFromSelect($columns, $selectQuery)->insert([]);
     }
 }

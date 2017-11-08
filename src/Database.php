@@ -8,8 +8,6 @@ use Finesse\MicroDB\Exceptions\PDOException as ConnectionPDOException;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\ExceptionInterface;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
-use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
-use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInvalidReturnValueException;
 use Finesse\QueryScribe\GrammarInterface;
 use Finesse\QueryScribe\Grammars\CommonGrammar;
 use Finesse\QueryScribe\Grammars\MySQLGrammar;
@@ -110,13 +108,7 @@ class Database
      */
     public function table($table, string $alias = null): Query
     {
-        try {
-            return (new Query($this))->table($table, $alias);
-        } catch (QueryScribeInvalidArgumentException $exception) {
-            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
-        } catch (QueryScribeInvalidReturnValueException $exception) {
-            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
-        }
+        return (new Query($this))->table($table, $alias);
     }
 
     /**

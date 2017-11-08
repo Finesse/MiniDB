@@ -5,6 +5,9 @@ namespace Finesse\MiniDB\Tests;
 use Finesse\MiniDB\Database;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
+use Finesse\MiniDB\Exceptions\InvalidArgumentException;
+use Finesse\MiniDB\Query;
+use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
 use Finesse\QueryScribe\Exceptions\InvalidQueryException as QueryScribeInvalidQueryException;
 
 /**
@@ -81,6 +84,24 @@ class QueryTest extends TestCase
 
         $this->assertException(DatabaseException::class, function () use ($database) {
             $database->table('animals')->get();
+        });
+
+        $this->assertException(InvalidArgumentException::class, function () use ($database) {
+            $database->table('animals')->where(new \stdClass);
+        }, function (InvalidArgumentException $exception) {
+            $this->assertInstanceOf(QueryScribeInvalidArgumentException::class, $exception->getPrevious());
+        });
+
+        // Any other unexpected error
+        $query = new class ($database) extends Query {
+            public function throwUnexpectedException() {
+                throw new \TypeError('Hello');
+            }
+        };
+        $this->assertException(\TypeError::class, function () use ($query) {
+            $query->throwUnexpectedException();
+        }, function (\TypeError $exception) {
+            $this->assertEquals('Hello', $exception->getMessage());
         });
     }
 }

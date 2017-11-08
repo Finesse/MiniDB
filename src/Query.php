@@ -3,18 +3,20 @@
 namespace Finesse\MiniDB;
 
 use Finesse\MiniDB\Exceptions\DatabaseException;
-use Finesse\MiniDB\Exceptions\ExceptionInterface;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
 use Finesse\MiniDB\QueryParts\InsertTrait;
 use Finesse\MiniDB\QueryParts\SelectTrait;
 use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
 use Finesse\QueryScribe\Exceptions\InvalidQueryException as QueryScribeInvalidQueryException;
+use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInvalidReturnValueException;
 use Finesse\QueryScribe\Query as BaseQuery;
 use Finesse\QueryScribe\StatementInterface;
 
 /**
  * Query builder. Builds SQL queries and performs them on a database.
+ *
+ * The methods thrown exception is Finesse\QueryScribe\Exceptions\InvalidArgumentException if not specified explicitly.
  *
  * @author Surgie
  */
@@ -55,12 +57,16 @@ class Query extends BaseQuery
      */
     public function update(array $values): int
     {
-        return $this->performQuery(function () use ($values) {
-            $query = (clone $this)->addUpdate($values);
-            $query = $this->database->getTablePrefixer()->process($query);
+        $query = (clone $this)->addUpdate($values);
+        $query = $this->database->getTablePrefixer()->process($query);
+
+        try {
             $compiled = $this->database->getGrammar()->compileUpdate($query);
-            return $this->database->update($compiled->getSQL(), $compiled->getBindings());
-        });
+        } catch (QueryScribeInvalidQueryException $exception) {
+            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return $this->database->update($compiled->getSQL(), $compiled->getBindings());
     }
 
     /**
@@ -73,29 +79,32 @@ class Query extends BaseQuery
      */
     public function delete(): int
     {
-        return $this->performQuery(function () {
-            $query = (clone $this)->setDelete();
-            $query = $this->database->getTablePrefixer()->process($query);
-            $compiled = $this->database->getGrammar()->compileDelete($query);
-            return $this->database->delete($compiled->getSQL(), $compiled->getBindings());
-        });
-    }
+        $query = (clone $this)->setDelete();
+        $query = $this->database->getTablePrefixer()->process($query);
 
-    /**
-     * Performs a query compilation with database query and handles exceptions.
-     *
-     * @param \Closure $callback Function that performs the compilation with query
-     * @return mixed The $callback return value
-     * @return ExceptionInterface|\Throwable
-     */
-    protected function performQuery(\Closure $callback)
-    {
         try {
-            return $callback();
-        } catch (QueryScribeInvalidArgumentException $exception) {
-            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
+            $compiled = $this->database->getGrammar()->compileDelete($query);
         } catch (QueryScribeInvalidQueryException $exception) {
             throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
         }
+
+        return $this->database->delete($compiled->getSQL(), $compiled->getBindings());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function handleException(\Throwable $exception)
+    {
+        if (
+            $exception instanceof QueryScribeInvalidArgumentException ||
+            $exception instanceof QueryScribeInvalidReturnValueException
+        ) {
+            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return parent::handleException($exception);
+    }
+
+
 }

@@ -5,6 +5,7 @@ namespace Finesse\MiniDB\QueryParts;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
+use Finesse\QueryScribe\Exceptions\InvalidQueryException as QueryScribeInvalidQueryException;
 use Finesse\QueryScribe\StatementInterface;
 
 /**
@@ -23,11 +24,15 @@ trait SelectTrait
      */
     public function get(): array
     {
-        return $this->performQuery(function () {
-            $query = $this->database->getTablePrefixer()->process($this);
+        $query = $this->database->getTablePrefixer()->process($this);
+
+        try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->select($compiled->getSQL(), $compiled->getBindings());
-        });
+        } catch (QueryScribeInvalidQueryException $exception) {
+            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return $this->database->select($compiled->getSQL(), $compiled->getBindings());
     }
 
     /**
@@ -39,12 +44,16 @@ trait SelectTrait
      */
     public function first()
     {
-        return $this->performQuery(function () {
-            $query = (clone $this)->limit(1);
-            $query = $this->database->getTablePrefixer()->process($query);
+        $query = (clone $this)->limit(1);
+        $query = $this->database->getTablePrefixer()->process($query);
+
+        try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings());
-        });
+        } catch (QueryScribeInvalidQueryException $exception) {
+            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings());
     }
 
     /**
@@ -58,14 +67,18 @@ trait SelectTrait
      */
     public function count($column = '*'): int
     {
-        return $this->performQuery(function () use ($column) {
-            $query = clone $this;
-            $query->select = [];
-            $query->addCount($column, 'aggregate')->offset(null)->limit(null);
-            $query = $this->database->getTablePrefixer()->process($query);
+        $query = clone $this;
+        $query->select = [];
+        $query->addCount($column, 'aggregate')->offset(null)->limit(null);
+        $query = $this->database->getTablePrefixer()->process($query);
+
+        try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
-        });
+        } catch (QueryScribeInvalidQueryException $exception) {
+            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
     }
 
     /**
@@ -79,14 +92,18 @@ trait SelectTrait
      */
     public function avg($column)
     {
-        return $this->performQuery(function () use ($column) {
-            $query = clone $this;
-            $query->select = [];
-            $query->addAvg($column, 'aggregate')->offset(null)->limit(null);
-            $query = $this->database->getTablePrefixer()->process($query);
+        $query = clone $this;
+        $query->select = [];
+        $query->addAvg($column, 'aggregate')->offset(null)->limit(null);
+        $query = $this->database->getTablePrefixer()->process($query);
+
+        try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
-        });
+        } catch (QueryScribeInvalidQueryException $exception) {
+            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
     }
 
     /**
@@ -100,14 +117,18 @@ trait SelectTrait
      */
     public function sum($column)
     {
-        return $this->performQuery(function () use ($column) {
-            $query = clone $this;
-            $query->select = [];
-            $query->addSum($column, 'aggregate')->offset(null)->limit(null);
-            $query = $this->database->getTablePrefixer()->process($query);
+        $query = clone $this;
+        $query->select = [];
+        $query->addSum($column, 'aggregate')->offset(null)->limit(null);
+        $query = $this->database->getTablePrefixer()->process($query);
+
+        try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
-        });
+        } catch (QueryScribeInvalidQueryException $exception) {
+            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
     }
 
     /**
@@ -121,14 +142,18 @@ trait SelectTrait
      */
     public function min($column)
     {
-        return $this->performQuery(function () use ($column) {
-            $query = clone $this;
-            $query->select = [];
-            $query->addMin($column, 'aggregate')->offset(null)->limit(null);
-            $query = $this->database->getTablePrefixer()->process($query);
+        $query = clone $this;
+        $query->select = [];
+        $query->addMin($column, 'aggregate')->offset(null)->limit(null);
+        $query = $this->database->getTablePrefixer()->process($query);
+
+        try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
-        });
+        } catch (QueryScribeInvalidQueryException $exception) {
+            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
     }
 
     /**
@@ -142,14 +167,18 @@ trait SelectTrait
      */
     public function max($column)
     {
-        return $this->performQuery(function () use ($column) {
-            $query = clone $this;
-            $query->select = [];
-            $query->addMax($column, 'aggregate')->offset(null)->limit(null);
-            $query = $this->database->getTablePrefixer()->process($query);
+        $query = clone $this;
+        $query->select = [];
+        $query->addMax($column, 'aggregate')->offset(null)->limit(null);
+        $query = $this->database->getTablePrefixer()->process($query);
+
+        try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
-        });
+        } catch (QueryScribeInvalidQueryException $exception) {
+            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
     }
 
     /**
