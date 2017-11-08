@@ -43,6 +43,10 @@ class QueryTest extends TestCase
             $this->assertEquals('Lol', $row['name']);
             $this->assertNull($row['value']);
         }
+
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            (new Query($database))->update(['foo' => 'bar']);
+        });
     }
 
     /**
@@ -67,6 +71,10 @@ class QueryTest extends TestCase
 
         $this->assertEquals(3, $database->table('items')->delete());
         $this->assertEmpty($database->select('SELECT * FROM pre_items'));
+
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            (new Query($database))->delete();
+        });
     }
 
     /**
@@ -95,7 +103,7 @@ class QueryTest extends TestCase
         // Any other unexpected error
         $query = new class ($database) extends Query {
             public function throwUnexpectedException() {
-                throw new \TypeError('Hello');
+                return $this->handleException(new \TypeError('Hello'));
             }
         };
         $this->assertException(\TypeError::class, function () use ($query) {

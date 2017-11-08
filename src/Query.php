@@ -62,8 +62,8 @@ class Query extends BaseQuery
 
         try {
             $compiled = $this->database->getGrammar()->compileUpdate($query);
-        } catch (QueryScribeInvalidQueryException $exception) {
-            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
         }
 
         return $this->database->update($compiled->getSQL(), $compiled->getBindings());
@@ -84,8 +84,8 @@ class Query extends BaseQuery
 
         try {
             $compiled = $this->database->getGrammar()->compileDelete($query);
-        } catch (QueryScribeInvalidQueryException $exception) {
-            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
         }
 
         return $this->database->delete($compiled->getSQL(), $compiled->getBindings());
@@ -101,6 +101,10 @@ class Query extends BaseQuery
             $exception instanceof QueryScribeInvalidReturnValueException
         ) {
             throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        if ($exception instanceof QueryScribeInvalidQueryException) {
+            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
         }
 
         return parent::handleException($exception);

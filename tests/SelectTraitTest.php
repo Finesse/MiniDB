@@ -3,6 +3,7 @@
 namespace Finesse\MiniDB\Tests;
 
 use Finesse\MiniDB\Database;
+use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
 use Finesse\MiniDB\Query;
 use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
@@ -71,6 +72,14 @@ class SelectTraitTest extends TestCase
 
         // Zero rows
         $this->assertNull($database->table('items')->where('value', '<', -1000)->first());
+
+        // Incorrect query error
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            (new Query($database))->get();
+        });
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            (new Query($database))->first();
+        });
     }
 
     /**
@@ -103,6 +112,23 @@ class SelectTraitTest extends TestCase
             $database->table('items')->count(['foo', 'bar']);
         }, function (InvalidArgumentException $exception) {
             $this->assertInstanceOf(QueryScribeInvalidArgumentException::class, $exception->getPrevious());
+        });
+
+        // Incorrect query error
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            (new Query($database))->count();
+        });
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            (new Query($database))->avg('value');
+        });
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            (new Query($database))->sum('value');
+        });
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            (new Query($database))->min('value');
+        });
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            (new Query($database))->max('value');
         });
     }
 

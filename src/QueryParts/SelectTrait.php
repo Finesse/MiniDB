@@ -5,7 +5,6 @@ namespace Finesse\MiniDB\QueryParts;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
-use Finesse\QueryScribe\Exceptions\InvalidQueryException as QueryScribeInvalidQueryException;
 use Finesse\QueryScribe\StatementInterface;
 
 /**
@@ -28,8 +27,8 @@ trait SelectTrait
 
         try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-        } catch (QueryScribeInvalidQueryException $exception) {
-            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
         }
 
         return $this->database->select($compiled->getSQL(), $compiled->getBindings());
@@ -49,8 +48,8 @@ trait SelectTrait
 
         try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-        } catch (QueryScribeInvalidQueryException $exception) {
-            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
         }
 
         return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings());
@@ -74,8 +73,8 @@ trait SelectTrait
 
         try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-        } catch (QueryScribeInvalidQueryException $exception) {
-            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
         }
 
         return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
@@ -99,8 +98,8 @@ trait SelectTrait
 
         try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-        } catch (QueryScribeInvalidQueryException $exception) {
-            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
         }
 
         return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
@@ -124,8 +123,8 @@ trait SelectTrait
 
         try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-        } catch (QueryScribeInvalidQueryException $exception) {
-            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
         }
 
         return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
@@ -149,8 +148,8 @@ trait SelectTrait
 
         try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-        } catch (QueryScribeInvalidQueryException $exception) {
-            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
         }
 
         return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
@@ -174,8 +173,8 @@ trait SelectTrait
 
         try {
             $compiled = $this->database->getGrammar()->compileSelect($query);
-        } catch (QueryScribeInvalidQueryException $exception) {
-            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
         }
 
         return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];

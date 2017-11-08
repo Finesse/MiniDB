@@ -3,6 +3,7 @@
 namespace Finesse\MiniDB\Tests;
 
 use Finesse\MiniDB\Database;
+use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Query;
 
 /**
@@ -49,5 +50,13 @@ class InsertTraitTest extends TestCase
             ['id' => 5, 'name' => 'Cookie Monster', 'address' => '123 Sesame str.'],
             ['id' => 6, 'name' => 'John Doe', 'address' => null]
         ], $database->select('SELECT * FROM '.$database->addTablePrefix('users').' WHERE id > ? ORDER BY id', [4]));
+
+        // Incorrect query error
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            (new Query($database))->insert(['foo' => 'bar']);
+        });
+        $this->assertException(IncorrectQueryException::class, function () use ($database) {
+            (new Query($database))->insertGetId(['foo' => 'bar']);
+        });
     }
 }
