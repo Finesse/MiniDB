@@ -50,6 +50,20 @@ class QueryProxy extends BaseQueryProxy
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function chunk(int $size, callable $callback)
+    {
+        try {
+            return $this->baseQuery->chunk($size, function (array $rows) use ($callback) {
+                $callback(array_map([$this, 'processFetchedRow'], $rows));
+            });
+        } catch (\Throwable $exception) {
+            return $this->handleBaseQueryException($exception);
+        }
+    }
+
+    /**
      * Processes a row fetched from the database before returning it.
      *
      * @param array $row

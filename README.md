@@ -178,7 +178,7 @@ $database
     ->orderBy('id')
     ->chunk(100, function ($users) {
         foreach ($users as $user) {
-            // Process a row here
+            // Process the row here
         }
     });
 ```
