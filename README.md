@@ -167,6 +167,43 @@ $database
  */
 ```
 
+##### Pagination
+
+We suggest [Pagerfanta](https://github.com/whiteoctober/Pagerfanta) to easily make pagination.
+
+First install Pagerfanta using [composer](https://getcomposer.org) by running in a console:
+
+```bash
+composer require pagerfanta/pagerfanta
+```
+
+Then make a query from which rows should be taken:
+
+```php
+$query = $database
+    ->table('posts')
+    ->where('category', 'archive')
+    ->orderBy('date', 'desc');
+    // Don't call ->get() here
+```
+
+And use Pagerfanta:
+
+```php
+use Finesse\MiniDB\ThirdParty\PagerfantaAdapter;
+use Pagerfanta\Pagerfanta;
+
+$paginator = new Pagerfanta(new PagerfantaAdapter($query));
+$paginator->setMaxPerPage(10); // The number of rows on a page
+$paginator->setCurrentPage(3); // The current page number
+
+$currentPageRows = $paginator->getCurrentPageResults(); // The rows for the current page
+$pagesCount = $paginator->getNbPages();                 // Total pages count
+$haveToPaginate = $paginator->haveToPaginate();         // Whether the number of results is higher than the max per page
+```
+
+You can find more reference and examples for Pagerfanta [there](https://github.com/whiteoctober/Pagerfanta#usage).
+
 ##### Chunking rows
 
 If you need to process a large amount of rows you can use chunking. In this approach portions of rows are fetched from 
@@ -252,43 +289,6 @@ $database
     ->orWhere('status', 'stink')
     ->delete(); // 5 (number of deleted rows)
 ```
-
-#### Pagination
-
-We suggest [Pagerfanta](https://github.com/whiteoctober/Pagerfanta) to easily make pagination.
-
-First install Pagerfanta using [composer](https://getcomposer.org) by running in a console:
-
-```bash
-composer require pagerfanta/pagerfanta
-```
-
-Then make a query from which rows should be taken:
-
-```php
-$query = $database
-    ->table('posts')
-    ->where('category', 'archive')
-    ->orderBy('date', 'desc');
-    // Don't call ->get() here
-```
-
-And use Pagerfanta:
-
-```php
-use Finesse\MiniDB\ThirdParty\PagerfantaAdapter;
-use Pagerfanta\Pagerfanta;
-
-$paginator = new Pagerfanta(new PagerfantaAdapter($query));
-$paginator->setMaxPerPage(10); // The number of rows on a page
-$paginator->setCurrentPage(3); // The current page number
-
-$currentPageRows = $paginator->getCurrentPageResults(); // The rows for the current page
-$pagesCount = $paginator->getNbPages();                 // Total pages count
-$haveToPaginate = $paginator->haveToPaginate();         // Whether the number of results is higher than the max per page
-```
-
-You can find more reference and examples for Pagerfanta [there](https://github.com/whiteoctober/Pagerfanta#usage).
 
 
 ## Versions compatibility
