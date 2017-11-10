@@ -16,7 +16,7 @@ use Finesse\QueryScribe\StatementInterface;
 /**
  * Query builder. Builds SQL queries and performs them on a database.
  *
- * The methods thrown exception is Finesse\QueryScribe\Exceptions\InvalidArgumentException if not specified explicitly.
+ * All the methods throw Finesse\MiniDB\Exceptions\InvalidArgumentException exceptions if not specified explicitly.
  *
  * @author Surgie
  */
