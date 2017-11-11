@@ -112,6 +112,8 @@ $database->select('SELECT * FROM users WHERE name = ? OR email = ?', ['Jack', 'j
         ['id' => 17, 'name' => 'Bill', 'email' => 'jack@example.com', 'account' => -100]
     ]
  */
+ 
+$database->import('path/to/file.sql');
 ```
 
 The cell values are returned as they are returned by the underlying database connection. They are not casted 
