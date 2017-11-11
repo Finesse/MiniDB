@@ -2,6 +2,7 @@
 
 namespace Finesse\MiniDB\QueryParts;
 
+use Finesse\MiniDB\Database;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
@@ -14,6 +15,11 @@ use Finesse\QueryScribe\StatementInterface;
  */
 trait SelectTrait
 {
+    /**
+     * @var Database Database on which the query should be performed
+     */
+    protected $database;
+
     /**
      * Performs a select query and returns the selected rows. Doesn't modify itself.
      *

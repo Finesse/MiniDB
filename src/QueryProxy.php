@@ -2,6 +2,7 @@
 
 namespace Finesse\MiniDB;
 
+use Finesse\MiniDB\QueryParts\SelectTrait;
 use Finesse\QueryScribe\QueryProxy as BaseQueryProxy;
 
 /**
@@ -18,6 +19,7 @@ class QueryProxy extends BaseQueryProxy
     /**
      * {@inheritDoc}
      * @return mixed[]
+     * @see SelectTrait::get
      */
     public function get(): array
     {
@@ -33,6 +35,7 @@ class QueryProxy extends BaseQueryProxy
     /**
      * {@inheritDoc}
      * @return mixed
+     * @see SelectTrait::first
      */
     public function first()
     {
@@ -51,6 +54,7 @@ class QueryProxy extends BaseQueryProxy
 
     /**
      * {@inheritDoc}
+     * @see SelectTrait::chunk
      */
     public function chunk(int $size, callable $callback)
     {

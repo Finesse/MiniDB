@@ -2,6 +2,7 @@
 
 namespace Finesse\MiniDB\QueryParts;
 
+use Finesse\MiniDB\Database;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
@@ -15,6 +16,11 @@ use Finesse\QueryScribe\StatementInterface;
  */
 trait InsertTrait
 {
+    /**
+     * @var Database Database on which the query should be performed
+     */
+    protected $database;
+
     /**
      * Inserts rows to a table. Doesn't modify itself.
      *
