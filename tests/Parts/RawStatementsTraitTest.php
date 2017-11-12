@@ -129,7 +129,7 @@ class RawStatementsTraitTest extends TestCase
 
         // Wrapping Connection FileException
         $this->assertException(FileException::class, function () use ($database) {
-            $database->import(imagecreatetruecolor(1, 1));
+            $database->import('/not/existing/file/__gBpDtW');
         }, function (FileException $exception) {
             $this->assertInstanceOf(ConnectionFileException::class, $exception->getPrevious());
         });
