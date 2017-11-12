@@ -1,10 +1,11 @@
 <?php
 
-namespace Finesse\MiniDB\Tests;
+namespace Finesse\MiniDB\Tests\Parts;
 
 use Finesse\MiniDB\Database;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Query;
+use Finesse\MiniDB\Tests\TestCase;
 
 /**
  * Tests the InsertTrait trait

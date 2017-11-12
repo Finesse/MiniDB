@@ -1,11 +1,12 @@
 <?php
 
-namespace Finesse\MiniDB\Tests;
+namespace Finesse\MiniDB\Tests\Parts;
 
 use Finesse\MiniDB\Database;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
 use Finesse\MiniDB\Query;
+use Finesse\MiniDB\Tests\TestCase;
 use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
 
 /**

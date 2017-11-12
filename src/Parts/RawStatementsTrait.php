@@ -1,6 +1,6 @@
 <?php
 
-namespace Finesse\MiniDB\DatabaseParts;
+namespace Finesse\MiniDB\Parts;
 
 use Finesse\MicroDB\Connection;
 use Finesse\MicroDB\Exceptions\FileException as ConnectionFileException;

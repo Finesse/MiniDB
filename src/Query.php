@@ -5,8 +5,9 @@ namespace Finesse\MiniDB;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
-use Finesse\MiniDB\QueryParts\InsertTrait;
-use Finesse\MiniDB\QueryParts\SelectTrait;
+use Finesse\MiniDB\Parts\InsertTrait;
+use Finesse\MiniDB\Parts\RawHelpersTrait;
+use Finesse\MiniDB\Parts\SelectTrait;
 use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
 use Finesse\QueryScribe\Exceptions\InvalidQueryException as QueryScribeInvalidQueryException;
 use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInvalidReturnValueException;
@@ -22,7 +23,7 @@ use Finesse\QueryScribe\StatementInterface;
  */
 class Query extends BaseQuery
 {
-    use SelectTrait, InsertTrait;
+    use SelectTrait, InsertTrait, RawHelpersTrait;
 
     /**
      * @var Database Database on which the query should be performed

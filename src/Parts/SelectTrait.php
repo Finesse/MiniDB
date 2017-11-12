@@ -1,6 +1,6 @@
 <?php
 
-namespace Finesse\MiniDB\QueryParts;
+namespace Finesse\MiniDB\Parts;
 
 use Finesse\MiniDB\Database;
 use Finesse\MiniDB\Exceptions\DatabaseException;

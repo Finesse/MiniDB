@@ -2,7 +2,7 @@
 
 namespace Finesse\MiniDB;
 
-use Finesse\MiniDB\QueryParts\SelectTrait;
+use Finesse\MiniDB\Parts\SelectTrait;
 use Finesse\QueryScribe\QueryProxy as BaseQueryProxy;
 
 /**

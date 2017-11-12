@@ -96,19 +96,4 @@ class DatabaseTest extends TestCase
         $this->assertEquals('bar-foo-', $database2->getTablePrefixer()->tablePrefix);;
         $this->assertEquals('foo-', $database->getTablePrefixer()->tablePrefix);
     }
-
-    /**
-     * Tests the `addTablePrefix` and `addTablePrefixToColumn` methods
-     */
-    public function testAddTablePrefix()
-    {
-        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'prefix_']);
-
-        $this->assertEquals('prefix_tab1', $database->addTablePrefix('tab1'));
-        $this->assertEquals('database.prefix_table', $database->addTablePrefix('database.table'));
-
-        $this->assertEquals('column1', $database->addTablePrefixToColumn('column1'));
-        $this->assertEquals('prefix_table.column1', $database->addTablePrefixToColumn('table.column1'));
-        $this->assertEquals('database.prefix_table.column1', $database->addTablePrefixToColumn('database.table.column1'));
-    }
 }

@@ -4,9 +4,10 @@ namespace Finesse\MiniDB;
 
 use Finesse\MicroDB\Connection;
 use Finesse\MicroDB\Exceptions\PDOException as ConnectionPDOException;
-use Finesse\MiniDB\DatabaseParts\RawStatementsTrait;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
+use Finesse\MiniDB\Parts\RawHelpersTrait;
+use Finesse\MiniDB\Parts\RawStatementsTrait;
 use Finesse\QueryScribe\GrammarInterface;
 use Finesse\QueryScribe\Grammars\CommonGrammar;
 use Finesse\QueryScribe\Grammars\MySQLGrammar;
@@ -22,7 +23,7 @@ use Finesse\QueryScribe\StatementInterface;
  */
 class Database
 {
-    use MakeRawTrait, RawStatementsTrait;
+    use MakeRawTrait, RawStatementsTrait, RawHelpersTrait;
 
     /**
      * @var Connection Database connection
@@ -108,28 +109,6 @@ class Database
     public function table($table, string $alias = null): Query
     {
         return (new Query($this))->table($table, $alias);
-    }
-
-    /**
-     * Adds the table prefix to a table name.
-     *
-     * @param string $table Table name without quotes
-     * @return string Table name with prefix
-     */
-    public function addTablePrefix(string $table): string
-    {
-        return $this->tablePrefixer->addTablePrefix($table);
-    }
-
-    /**
-     * Adds the table prefix to a column name which may contain table name or alias.
-     *
-     * @param string $column Column name without quotes
-     * @return string Column name with prefixed table name
-     */
-    public function addTablePrefixToColumn(string $column): string
-    {
-        return $this->tablePrefixer->addTablePrefixToColumn($column);
     }
 
     /**

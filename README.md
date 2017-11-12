@@ -49,7 +49,7 @@ Supported DBMSs:
 
 * MySQL
 * SQLite
-* PostrgeSQL (partially, see [the issue](https://github.com/FinesseRus/MicroDB#known-problems))
+* Maybe any other, didn't test it
 
 If you need a new database system support please implement it [there](https://github.com/FinesseRus/MicroDB) and 
 [there](https://github.com/FinesseRus/QueryScribe) using pull requests.
@@ -291,6 +291,26 @@ $database
     ->orWhere('status', 'stink')
     ->delete(); // 5 (number of deleted rows)
 ```
+
+#### Helpers
+
+Escape LIKE special wildcard characters:
+
+```php
+$searchString = '%iamhacker%';
+
+$query->where('name', 'like', $query->escapeLikeWildcards($searchString).'_'); // "name" LIKE \%iamhacker\%_
+```
+
+Wrap a table or column name in quotes:
+
+```php
+$query->whereRaw('MIN('.$query->quoteIdentifier('data"base').'.'.$grammar->quoteIdentifier('ta"ble').') > 10');
+// or
+$query->whereRaw('MIN('.$query->quoteCompositeIdentifier('data"base.ta"ble').') > 10'); // MIN("data""base.ta""ble") > 10
+```
+
+The above methods are also available in a `Database` instance.
 
 
 ## Versions compatibility

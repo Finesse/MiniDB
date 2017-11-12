@@ -1,6 +1,6 @@
 <?php
 
-namespace Finesse\MiniDB\Tests;
+namespace Finesse\MiniDB\Tests\Parts;
 
 use Finesse\MicroDB\Connection;
 use Finesse\MicroDB\Exceptions\FileException as ConnectionFileException;
@@ -10,6 +10,7 @@ use Finesse\MiniDB\Database;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\FileException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
+use Finesse\MiniDB\Tests\TestCase;
 use Finesse\QueryScribe\Grammars\SQLiteGrammar;
 
 /**
