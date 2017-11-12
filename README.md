@@ -307,10 +307,10 @@ Wrap a table or column name in quotes:
 ```php
 $query->whereRaw('MIN('.$query->quoteIdentifier('data"base').'.'.$grammar->quoteIdentifier('ta"ble').') > 10');
 // or
-$query->whereRaw('MIN('.$query->quoteCompositeIdentifier('data"base.ta"ble').') > 10'); // MIN("data""base.ta""ble") > 10
+$query->whereRaw('MIN('.$query->quoteCompositeIdentifier('data"base.ta"ble').') > 10'); // MIN("data""base"."ta""ble") > 10
 ```
 
-The above methods are also available in a `Database` instance.
+The above methods are also available in a `Database` object.
 
 
 ## Versions compatibility
