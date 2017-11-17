@@ -23,7 +23,7 @@ $database->statement('
     CREATE TABLE '.$database->addTablePrefix('users').' (
         id INT(11) NOT NULL AUTO_INCREMENT,
         email VARCHAR(50) NOT NULL, 
-        account INT(11) NOT NULL DEFAULT 0,
+        account INT(11) NOT NULL DEFAULT 0
     )
 ');
 
