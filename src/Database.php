@@ -98,6 +98,20 @@ class Database
     }
 
     /**
+     * Makes an empty query instance. You should specify a table on the returned query, otherwise you won't be able to
+     * perform the query on the database.
+     *
+     * @ignore It is the only place where the package makes query builder instances. So if you need to extend this class
+     *     and use a custom query builder class, you have to override only this method.
+     *
+     * @return Query
+     */
+    public function builder(): Query
+    {
+        return new Query($this);
+    }
+
+    /**
      * Makes a query builder instance with a selected table.
      *
      * @param string|\Closure|Query|StatementInterface $table Not prefixed table name without quotes
@@ -108,7 +122,7 @@ class Database
      */
     public function table($table, string $alias = null): Query
     {
-        return (new Query($this))->table($table, $alias);
+        return $this->builder()->table($table, $alias);
     }
 
     /**

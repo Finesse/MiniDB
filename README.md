@@ -39,6 +39,7 @@ $database->table('users')->where('account', '>', 600)->get(); // Jack and Richar
 Key features:
 
 * Light with a small number of light dependencies.
+* Extensible. Examples will come soon.
 * The [query builder](https://github.com/FinesseRus/QueryScribe) and the 
   [database connector](https://github.com/FinesseRus/MicroDB) may be used separately.
 * Supports table prefixes.

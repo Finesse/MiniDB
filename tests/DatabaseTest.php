@@ -59,6 +59,10 @@ class DatabaseTest extends TestCase
     public function testCreateQuery()
     {
         $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'test_']);
+
+        $query = $database->builder();
+        $this->assertNull($query->table);
+
         $query = $database->table('items', 'i');
         $this->assertEquals('items', $query->table);
         $this->assertEquals('i', $query->tableAlias);
