@@ -126,6 +126,9 @@ Table prefix is not applied in raw queries. Use `$database->addTablePrefix()` to
 $database->select('SELECT * FROM '.$database->addTablePrefix('users').' ORDER BY id');
 ```
 
+Be careful, the `statements` and the `import` methods don't throw an exception if the second or a next statement of the 
+query has an error. This is [a PDO bug](https://stackoverflow.com/a/28867491/1118709).
+
 You can find more information and examples of raw queries [there](https://github.com/FinesseRus/MicroDB#reference).
 
 ### Query builder
