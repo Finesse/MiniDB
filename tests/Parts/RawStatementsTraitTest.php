@@ -88,16 +88,20 @@ class RawStatementsTraitTest extends TestCase
         $stream = tmpfile();
         fputs($stream, "
             CREATE TABLE test2(id INTEGER PRIMARY KEY ASC, text TEXT);
-            INSERT INTO test2 (text) VALUES ('Hello');
-            INSERT INTO test2 (text) VALUES ('World');
+            INSERT INTO test2 (text) VALUES ('Hello'), ('World');
+            CREATE TABLE test3(id INTEGER PRIMARY KEY ASC, price NUMERIC);
+            INSERT INTO test3 (price) VALUES (443000);
+            INSERT INTO test3 (price) VALUES (45000), (12000);
         ");
         rewind($stream);
         $database->import($stream);
-        $this->assertNotEmpty($connection->select(
-            'SELECT * FROM sqlite_master WHERE type = ? AND name = ?',
-            ['table', 'test2']
-        ));
+        $this->assertEquals([
+            ['name' => 'test'],
+            ['name' => 'test2'],
+            ['name' => 'test3']
+        ], $connection->select('SELECT name FROM sqlite_master WHERE type = ? ORDER BY name', ['table']));
         $this->assertEquals(2, $connection->selectFirst('SELECT COUNT(*) AS count FROM test2')['count']);
+        $this->assertEquals(3, $connection->selectFirst('SELECT COUNT(*) AS count FROM test3')['count']);
     }
 
     /**
