@@ -134,7 +134,7 @@ You can find more information and examples of raw queries [there](https://github
 ### Query builder
 
 Basic examples are present here. You can find more cool examples 
-[there](https://github.com/FinesseRus/QueryScribe#building-queries)
+[there](https://github.com/FinesseRus/QueryScribe/blob/master/docs/building-queries.md)
 
 Values given to the query builder are treated safely to prevent SQL injections so you don't need to escape them.
 
