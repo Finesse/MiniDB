@@ -8,6 +8,8 @@ use Finesse\QueryScribe\QueryProxy as BaseQueryProxy;
 /**
  * Helps to extend a query object dynamically.
  *
+ * All the methods throw Finesse\MiniDB\Exceptions\ExceptionInterface.
+ *
  * {@inheritDoc}
  *
  * @mixin Query
@@ -25,11 +27,10 @@ class QueryProxy extends BaseQueryProxy
     {
         try {
             $rows = $this->baseQuery->get();
+            return array_map([$this, 'processFetchedRow'], $rows);
         } catch (\Throwable $exception) {
-            return $this->handleBaseQueryException($exception);
+            return $this->handleException($exception);
         }
-
-        return array_map([$this, 'processFetchedRow'], $rows);
     }
 
     /**
@@ -41,14 +42,14 @@ class QueryProxy extends BaseQueryProxy
     {
         try {
             $row = $this->baseQuery->first();
-        } catch (\Throwable $exception) {
-            return $this->handleBaseQueryException($exception);
-        }
 
-        if ($row === null) {
-            return $row;
-        } else {
-            return $this->processFetchedRow($row);
+            if ($row === null) {
+                return $row;
+            } else {
+                return $this->processFetchedRow($row);
+            }
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
         }
     }
 
@@ -63,7 +64,7 @@ class QueryProxy extends BaseQueryProxy
                 $callback(array_map([$this, 'processFetchedRow'], $rows));
             });
         } catch (\Throwable $exception) {
-            return $this->handleBaseQueryException($exception);
+            return $this->handleException($exception);
         }
     }
 

@@ -6,6 +6,7 @@ use Finesse\MicroDB\Connection;
 use Finesse\MiniDB\Database;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
+use Finesse\MiniDB\Exceptions\InvalidReturnValueException;
 use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
 use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInvalidReturnValueException;
 use Finesse\QueryScribe\Grammars\CommonGrammar;
@@ -73,11 +74,11 @@ class DatabaseTest extends TestCase
             $this->assertInstanceOf(QueryScribeInvalidArgumentException::class, $exception->getPrevious());
         });
 
-        $this->assertException(InvalidArgumentException::class, function () use ($database) {
+        $this->assertException(InvalidReturnValueException::class, function () use ($database) {
             $database->table(function () {
                 return 'foo';
             });
-        }, function (InvalidArgumentException $exception) {
+        }, function (InvalidReturnValueException $exception) {
             $this->assertInstanceOf(QueryScribeInvalidReturnValueException::class, $exception->getPrevious());
         });
     }

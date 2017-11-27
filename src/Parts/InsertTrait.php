@@ -34,20 +34,20 @@ trait InsertTrait
     public function insert(array $rows): int
     {
         $query = (clone $this)->addInsert($rows);
-        $count = 0;
-        $query = $this->database->getTablePrefixer()->process($query);
 
         try {
+            $query = $this->database->getTablePrefixer()->process($query);
             $statements = $this->database->getGrammar()->compileInsert($query);
+
+            $count = 0;
+            foreach ($statements as $statement) {
+                $count += $this->database->insert($statement->getSQL(), $statement->getBindings());
+            }
+
+            return $count;
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
-
-        foreach ($statements as $statement) {
-            $count += $this->database->insert($statement->getSQL(), $statement->getBindings());
-        }
-
-        return $count;
     }
 
     /**
@@ -64,20 +64,20 @@ trait InsertTrait
     public function insertGetId(array $row, string $sequence = null)
     {
         $query = (clone $this)->addInsert([$row]);
-        $query = $this->database->getTablePrefixer()->process($query);
 
         try {
+            $query = $this->database->getTablePrefixer()->process($query);
             $statements = $this->database->getGrammar()->compileInsert($query);
+
+            $id = null;
+            foreach ($statements as $statement) {
+                $id = $this->database->insertGetId($statement->getSQL(), $statement->getBindings(), $sequence);
+            }
+
+            return $id;
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
-
-        $id = null;
-        foreach ($statements as $statement) {
-            $id = $this->database->insertGetId($statement->getSQL(), $statement->getBindings(), $sequence);
-        }
-
-        return $id;
     }
 
     /**

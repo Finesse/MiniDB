@@ -6,6 +6,7 @@ use Finesse\MiniDB\Database;
 use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
+use Finesse\MiniDB\Exceptions\InvalidReturnValueException;
 use Finesse\QueryScribe\StatementInterface;
 
 /**
@@ -29,15 +30,13 @@ trait SelectTrait
      */
     public function get(): array
     {
-        $query = $this->database->getTablePrefixer()->process($this);
-
         try {
+            $query = $this->database->getTablePrefixer()->process($this);
             $compiled = $this->database->getGrammar()->compileSelect($query);
+            return $this->database->select($compiled->getSQL(), $compiled->getBindings());
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
-
-        return $this->database->select($compiled->getSQL(), $compiled->getBindings());
     }
 
     /**
@@ -50,15 +49,14 @@ trait SelectTrait
     public function first()
     {
         $query = (clone $this)->limit(1);
-        $query = $this->database->getTablePrefixer()->process($query);
 
         try {
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
+            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings());
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
-
-        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings());
     }
 
     /**
@@ -69,21 +67,21 @@ trait SelectTrait
      * @throws DatabaseException
      * @throws IncorrectQueryException
      * @throws InvalidArgumentException
+     * @throws InvalidReturnValueException
      */
     public function count($column = '*'): int
     {
         $query = clone $this;
         $query->select = [];
         $query->addCount($column, 'aggregate')->offset(null)->limit(null);
-        $query = $this->database->getTablePrefixer()->process($query);
 
         try {
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
+            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
-
-        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
     }
 
     /**
@@ -94,21 +92,21 @@ trait SelectTrait
      * @throws DatabaseException
      * @throws IncorrectQueryException
      * @throws InvalidArgumentException
+     * @throws InvalidReturnValueException
      */
     public function avg($column)
     {
         $query = clone $this;
         $query->select = [];
         $query->addAvg($column, 'aggregate')->offset(null)->limit(null);
-        $query = $this->database->getTablePrefixer()->process($query);
 
         try {
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
+            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
-
-        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
     }
 
     /**
@@ -119,21 +117,21 @@ trait SelectTrait
      * @throws DatabaseException
      * @throws IncorrectQueryException
      * @throws InvalidArgumentException
+     * @throws InvalidReturnValueException
      */
     public function sum($column)
     {
         $query = clone $this;
         $query->select = [];
         $query->addSum($column, 'aggregate')->offset(null)->limit(null);
-        $query = $this->database->getTablePrefixer()->process($query);
 
         try {
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
+            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
-
-        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
     }
 
     /**
@@ -144,21 +142,21 @@ trait SelectTrait
      * @throws DatabaseException
      * @throws IncorrectQueryException
      * @throws InvalidArgumentException
+     * @throws InvalidReturnValueException
      */
     public function min($column)
     {
         $query = clone $this;
         $query->select = [];
         $query->addMin($column, 'aggregate')->offset(null)->limit(null);
-        $query = $this->database->getTablePrefixer()->process($query);
 
         try {
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
+            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
-
-        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
     }
 
     /**
@@ -169,21 +167,21 @@ trait SelectTrait
      * @throws DatabaseException
      * @throws IncorrectQueryException
      * @throws InvalidArgumentException
+     * @throws InvalidReturnValueException
      */
     public function max($column)
     {
         $query = clone $this;
         $query->select = [];
         $query->addMax($column, 'aggregate')->offset(null)->limit(null);
-        $query = $this->database->getTablePrefixer()->process($query);
 
         try {
+            $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
+            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
-
-        return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
     }
 
     /**
