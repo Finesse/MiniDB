@@ -130,6 +130,7 @@ class Database
      *     of the DBMSs.
      * @return Query
      * @throws InvalidArgumentException
+     * @throws InvalidReturnValueException
      */
     public function table($table, string $alias = null): Query
     {

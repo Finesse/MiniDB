@@ -126,7 +126,7 @@ class RawStatementsTraitTest extends TestCase
 
         // Wrapping Connection InvalidArgumentException
         $this->assertException(InvalidArgumentException::class, function () use ($database) {
-            $database->select('SELECT * FROM sqlite_master WHERE name IN (?)', [['Anny', 'Bob']]);
+            $database->selectFirst('SELECT * FROM sqlite_master WHERE name IN (?)', [['Anny', 'Bob']]);
         }, function (InvalidArgumentException $exception) {
             $this->assertInstanceOf(ConnectionInvalidArgumentException::class, $exception->getPrevious());
         });
@@ -138,17 +138,34 @@ class RawStatementsTraitTest extends TestCase
             $this->assertInstanceOf(ConnectionFileException::class, $exception->getPrevious());
         });
 
-        // Wrapping any other exception
+        // Wrapping exceptions in all the other method
+        $this->assertException(DatabaseException::class, function () use ($database) {
+            $database->insertGetId('WRONG SQL');
+        });
+        $this->assertException(DatabaseException::class, function () use ($database) {
+            $database->update('WRONG SQL');
+        });
+        $this->assertException(DatabaseException::class, function () use ($database) {
+            $database->delete('WRONG SQL');
+        });
+        $this->assertException(DatabaseException::class, function () use ($database) {
+            $database->statement('WRONG SQL');
+        });
+        $this->assertException(DatabaseException::class, function () use ($database) {
+            $database->statements('WRONG SQL');
+        });
+
+        // Wrapping unexpected exception type
         $connection = new class extends Connection {
             public function __construct() {}
-            public function select(string $query, array $values = []): array
+            public function insert(string $query, array $values = []): int
             {
                 throw new \Exception('test');
             }
         };
         $database = new Database($connection, new SQLiteGrammar());
         $this->assertException(\Exception::class, function () use ($database) {
-            $database->select('');
+            $database->insert('');
         }, function (\Exception $exception) {
             $this->assertEquals('test', $exception->getMessage());
         });
