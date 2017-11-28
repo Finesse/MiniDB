@@ -33,9 +33,8 @@ trait InsertTrait
      */
     public function insert(array $rows): int
     {
-        $query = (clone $this)->addInsert($rows);
-
         try {
+            $query = (clone $this)->addInsert($rows);
             $query = $this->database->getTablePrefixer()->process($query);
             $statements = $this->database->getGrammar()->compileInsert($query);
 
@@ -63,9 +62,8 @@ trait InsertTrait
      */
     public function insertGetId(array $row, string $sequence = null)
     {
-        $query = (clone $this)->addInsert([$row]);
-
         try {
+            $query = (clone $this)->addInsert([$row]);
             $query = $this->database->getTablePrefixer()->process($query);
             $statements = $this->database->getGrammar()->compileInsert($query);
 

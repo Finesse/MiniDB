@@ -3,11 +3,7 @@
 namespace Finesse\MiniDB\Parts;
 
 use Finesse\MicroDB\Connection;
-use Finesse\MicroDB\Exceptions\FileException as ConnectionFileException;
-use Finesse\MicroDB\Exceptions\InvalidArgumentException as ConnectionInvalidArgumentException;
-use Finesse\MicroDB\Exceptions\PDOException as ConnectionPDOException;
 use Finesse\MiniDB\Exceptions\DatabaseException;
-use Finesse\MiniDB\Exceptions\ExceptionInterface;
 use Finesse\MiniDB\Exceptions\FileException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
 
@@ -34,9 +30,11 @@ trait RawStatementsTrait
      */
     public function select(string $query, array $values = []): array
     {
-        return $this->performQuery(function () use ($query, $values) {
+        try {
             return $this->connection->select($query, $values);
-        });
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
+        }
     }
 
     /**
@@ -50,9 +48,11 @@ trait RawStatementsTrait
      */
     public function selectFirst(string $query, array $values = [])
     {
-        return $this->performQuery(function () use ($query, $values) {
+        try {
             return $this->connection->selectFirst($query, $values);
-        });
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
+        }
     }
 
     /**
@@ -66,9 +66,11 @@ trait RawStatementsTrait
      */
     public function insert(string $query, array $values = []): int
     {
-        return $this->performQuery(function () use ($query, $values) {
+        try {
             return $this->connection->insert($query, $values);
-        });
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
+        }
     }
 
     /**
@@ -83,9 +85,11 @@ trait RawStatementsTrait
      */
     public function insertGetId(string $query, array $values = [], string $sequence = null)
     {
-        return $this->performQuery(function () use ($query, $values, $sequence) {
+        try {
             return $this->connection->insertGetId($query, $values, $sequence);
-        });
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
+        }
     }
 
     /**
@@ -99,9 +103,11 @@ trait RawStatementsTrait
      */
     public function update(string $query, array $values = []): int
     {
-        return $this->performQuery(function () use ($query, $values) {
+        try {
             return $this->connection->update($query, $values);
-        });
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
+        }
     }
 
     /**
@@ -115,9 +121,11 @@ trait RawStatementsTrait
      */
     public function delete(string $query, array $values = []): int
     {
-        return $this->performQuery(function () use ($query, $values) {
+        try {
             return $this->connection->delete($query, $values);
-        });
+        } catch (\Throwable $exception) {
+            return $this->handleException($exception);
+        }
     }
 
     /**
@@ -131,9 +139,11 @@ trait RawStatementsTrait
      */
     public function statement(string $query, array $values = [])
     {
-        $this->performQuery(function () use ($query, $values) {
+        try {
             $this->connection->statement($query, $values);
-        });
+        } catch (\Throwable $exception) {
+            $this->handleException($exception);
+        }
     }
 
     /**
@@ -144,9 +154,11 @@ trait RawStatementsTrait
      */
     public function statements(string $query)
     {
-        $this->performQuery(function () use ($query) {
+        try {
             $this->connection->statements($query);
-        });
+        } catch (\Throwable $exception) {
+            $this->handleException($exception);
+        }
     }
 
     /**
@@ -160,28 +172,10 @@ trait RawStatementsTrait
      */
     public function import($file)
     {
-        $this->performQuery(function () use ($file) {
-            $this->connection->import($file);
-        });
-    }
-
-    /**
-     * Performs a database query and handles exceptions.
-     *
-     * @param \Closure $callback Function that performs the query
-     * @return mixed The $callback return value
-     * @return ExceptionInterface|\Throwable
-     */
-    protected function performQuery(\Closure $callback)
-    {
         try {
-            return $callback();
-        } catch (ConnectionPDOException $exception) {
-            throw new DatabaseException($exception->getMessage(), $exception->getCode(), $exception);
-        } catch (ConnectionInvalidArgumentException $exception) {
-            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
-        } catch (ConnectionFileException $exception) {
-            throw new FileException($exception->getMessage(), $exception->getCode(), $exception);
+            $this->connection->import($file);
+        } catch (\Throwable $exception) {
+            $this->handleException($exception);
         }
     }
 }

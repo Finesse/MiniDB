@@ -20,6 +20,15 @@ class QueryProxy extends BaseQueryProxy
 {
     /**
      * {@inheritDoc}
+     * @param Query $baseQuery
+     */
+    public function __construct(Query $baseQuery)
+    {
+        parent::__construct($baseQuery);
+    }
+
+    /**
+     * {@inheritDoc}
      * @return mixed[]
      * @see SelectTrait::get
      */

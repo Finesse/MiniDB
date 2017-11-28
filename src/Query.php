@@ -9,9 +9,6 @@ use Finesse\MiniDB\Exceptions\InvalidReturnValueException;
 use Finesse\MiniDB\Parts\InsertTrait;
 use Finesse\MiniDB\Parts\RawHelpersTrait;
 use Finesse\MiniDB\Parts\SelectTrait;
-use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
-use Finesse\QueryScribe\Exceptions\InvalidQueryException as QueryScribeInvalidQueryException;
-use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInvalidReturnValueException;
 use Finesse\QueryScribe\Query as BaseQuery;
 use Finesse\QueryScribe\StatementInterface;
 
@@ -62,9 +59,8 @@ class Query extends BaseQuery
      */
     public function update(array $values): int
     {
-        $query = (clone $this)->addUpdate($values);
-
         try {
+            $query = (clone $this)->addUpdate($values);
             $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileUpdate($query);
             return $this->database->update($compiled->getSQL(), $compiled->getBindings());
@@ -84,9 +80,8 @@ class Query extends BaseQuery
      */
     public function delete(): int
     {
-        $query = (clone $this)->setDelete();
-
         try {
+            $query = (clone $this)->setDelete();
             $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileDelete($query);
             return $this->database->delete($compiled->getSQL(), $compiled->getBindings());
@@ -100,19 +95,11 @@ class Query extends BaseQuery
      */
     protected function handleException(\Throwable $exception)
     {
-        if ($exception instanceof QueryScribeInvalidArgumentException) {
-            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
+        try {
+            return parent::handleException($exception);
+        } catch (\Throwable $exception) {
+            return $this->database->handleException($exception);
         }
-
-        if ($exception instanceof QueryScribeInvalidReturnValueException) {
-            throw new InvalidReturnValueException($exception->getMessage(), $exception->getCode(), $exception);
-        }
-
-        if ($exception instanceof QueryScribeInvalidQueryException) {
-            throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
-        }
-
-        return parent::handleException($exception);
     }
 
 

@@ -3,11 +3,22 @@
 namespace Finesse\MiniDB;
 
 use Finesse\MicroDB\Connection;
+use Finesse\MicroDB\Exceptions\FileException as ConnectionFileException;
+use Finesse\MicroDB\Exceptions\InvalidArgumentException as ConnectionInvalidArgumentException;
 use Finesse\MicroDB\Exceptions\PDOException as ConnectionPDOException;
+use Finesse\MicroDB\IException as ConnectionException;
 use Finesse\MiniDB\Exceptions\DatabaseException;
+use Finesse\MiniDB\Exceptions\ExceptionInterface;
+use Finesse\MiniDB\Exceptions\FileException;
+use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
+use Finesse\MiniDB\Exceptions\InvalidReturnValueException;
 use Finesse\MiniDB\Parts\RawHelpersTrait;
 use Finesse\MiniDB\Parts\RawStatementsTrait;
+use Finesse\QueryScribe\Exceptions\ExceptionInterface as QueryScribeException;
+use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
+use Finesse\QueryScribe\Exceptions\InvalidQueryException as QueryScribeInvalidQueryException;
+use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInvalidReturnValueException;
 use Finesse\QueryScribe\GrammarInterface;
 use Finesse\QueryScribe\Grammars\CommonGrammar;
 use Finesse\QueryScribe\Grammars\MySQLGrammar;
@@ -176,5 +187,45 @@ class Database
             $this->grammar,
             new TablePrefixer($prefix.$this->tablePrefixer->tablePrefix)
         );
+    }
+
+    /**
+     * Handles an exception thrown by this class.
+     *
+     * @param \Throwable $exception The thrown exception
+     * @return mixed A value to return
+     * @throws \Throwable
+     */
+    public function handleException(\Throwable $exception)
+    {
+        if ($exception instanceof ExceptionInterface) {
+            throw $exception;
+        }
+
+        if ($exception instanceof ConnectionException) {
+            if ($exception instanceof ConnectionPDOException) {
+                throw new DatabaseException($exception->getMessage(), $exception->getCode(), $exception);
+            }
+            if ($exception instanceof ConnectionInvalidArgumentException) {
+                throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
+            }
+            if ($exception instanceof ConnectionFileException) {
+                throw new FileException($exception->getMessage(), $exception->getCode(), $exception);
+            }
+        }
+
+        if ($exception instanceof QueryScribeException) {
+            if ($exception instanceof QueryScribeInvalidArgumentException) {
+                throw new InvalidArgumentException($exception->getMessage(), $exception->getCode(), $exception);
+            }
+            if ($exception instanceof QueryScribeInvalidReturnValueException) {
+                throw new InvalidReturnValueException($exception->getMessage(), $exception->getCode(), $exception);
+            }
+            if ($exception instanceof QueryScribeInvalidQueryException) {
+                throw new IncorrectQueryException($exception->getMessage(), $exception->getCode(), $exception);
+            }
+        }
+
+        throw $exception;
     }
 }

@@ -48,9 +48,8 @@ trait SelectTrait
      */
     public function first()
     {
-        $query = (clone $this)->limit(1);
-
         try {
+            $query = (clone $this)->limit(1);
             $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings());
@@ -71,11 +70,10 @@ trait SelectTrait
      */
     public function count($column = '*'): int
     {
-        $query = clone $this;
-        $query->select = [];
-        $query->addCount($column, 'aggregate')->offset(null)->limit(null);
-
         try {
+            $query = clone $this;
+            $query->select = [];
+            $query->addCount($column, 'aggregate')->offset(null)->limit(null);
             $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
@@ -96,11 +94,10 @@ trait SelectTrait
      */
     public function avg($column)
     {
-        $query = clone $this;
-        $query->select = [];
-        $query->addAvg($column, 'aggregate')->offset(null)->limit(null);
-
         try {
+            $query = clone $this;
+            $query->select = [];
+            $query->addAvg($column, 'aggregate')->offset(null)->limit(null);
             $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
@@ -121,11 +118,10 @@ trait SelectTrait
      */
     public function sum($column)
     {
-        $query = clone $this;
-        $query->select = [];
-        $query->addSum($column, 'aggregate')->offset(null)->limit(null);
-
         try {
+            $query = clone $this;
+            $query->select = [];
+            $query->addSum($column, 'aggregate')->offset(null)->limit(null);
             $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
@@ -146,11 +142,10 @@ trait SelectTrait
      */
     public function min($column)
     {
-        $query = clone $this;
-        $query->select = [];
-        $query->addMin($column, 'aggregate')->offset(null)->limit(null);
-
         try {
+            $query = clone $this;
+            $query->select = [];
+            $query->addMin($column, 'aggregate')->offset(null)->limit(null);
             $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
@@ -171,11 +166,10 @@ trait SelectTrait
      */
     public function max($column)
     {
-        $query = clone $this;
-        $query->select = [];
-        $query->addMax($column, 'aggregate')->offset(null)->limit(null);
-
         try {
+            $query = clone $this;
+            $query->select = [];
+            $query->addMax($column, 'aggregate')->offset(null)->limit(null);
             $query = $this->database->getTablePrefixer()->process($query);
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
@@ -196,7 +190,7 @@ trait SelectTrait
     public function chunk(int $size, callable $callback)
     {
         if ($size <= 0) {
-            throw new InvalidArgumentException('Chunk size must be greater than zero');
+            $this->handleException(new InvalidArgumentException('Chunk size must be greater than zero'));
         }
 
         // A copy is made not to mutate this query
