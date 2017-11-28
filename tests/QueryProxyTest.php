@@ -5,8 +5,11 @@ namespace Finesse\MiniDB\Tests;
 use Finesse\MiniDB\Database;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
+use Finesse\MiniDB\Exceptions\InvalidReturnValueException;
 use Finesse\MiniDB\Query;
 use Finesse\MiniDB\QueryProxy;
+use Finesse\QueryScribe\Exceptions\InvalidArgumentException as QueryScribeInvalidArgumentException;
+use Finesse\QueryScribe\Exceptions\InvalidReturnValueException as QueryScribeInvalidReturnValueException;
 
 /**
  * Tests the QueryProxy class
@@ -129,6 +132,30 @@ class QueryProxyTest extends TestCase
         // Error handling
         $this->assertException(InvalidArgumentException::class, function () use ($database) {
             (new QueryProxy($database->table('items')))->chunk(-10, function () {});
+        });
+    }
+
+    /**
+     * Tests other errors handling
+     */
+    public function testErrors()
+    {
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:']);
+        $query = new Query($database);
+        $superQuery = new QueryProxy($query);
+
+        $this->assertException(InvalidArgumentException::class, function () use ($superQuery) {
+            $superQuery->where(new \stdClass);
+        }, function (InvalidArgumentException $exception) {
+            $this->assertInstanceOf(QueryScribeInvalidArgumentException::class, $exception->getPrevious());
+        });
+
+        $this->assertException(InvalidReturnValueException::class, function () use ($superQuery) {
+            $superQuery->applyCallback(function () {
+                return 'hello';
+            });
+        }, function (InvalidReturnValueException $exception) {
+            $this->assertInstanceOf(QueryScribeInvalidReturnValueException::class, $exception->getPrevious());
         });
     }
 }

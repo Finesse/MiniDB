@@ -98,9 +98,7 @@ class Query extends BaseQuery
         try {
             return parent::handleException($exception);
         } catch (\Throwable $exception) {
-            return $this->database->handleException($exception);
+            throw Helpers::wrapException($exception);
         }
     }
-
-
 }

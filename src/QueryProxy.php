@@ -87,4 +87,16 @@ class QueryProxy extends BaseQueryProxy
     {
         return $row;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function handleException(\Throwable $exception)
+    {
+        try {
+            return parent::handleException($exception);
+        } catch (\Throwable $exception) {
+            throw Helpers::wrapException($exception);
+        }
+    }
 }
