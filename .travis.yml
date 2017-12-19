@@ -4,8 +4,13 @@ php:
     - 7.1
     - 7.2
 
+env:
+    - DEPENDENCIES="high"
+    - DEPENDENCIES="low"
+
 install:
-    - composer install
+    - if [[ "$DEPENDENCIES" = 'high' ]]; then composer update; fi
+    - if [[ "$DEPENDENCIES" = 'low' ]]; then composer update --prefer-lowest; fi
     - composer require satooshi/php-coveralls --dev
 
 script:
