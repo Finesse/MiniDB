@@ -12,11 +12,11 @@ syntax and an interface for performing pure SQL queries.
 
 ```php
 $database = Database::create([
-    'driver' => 'mysql',
-    'dsn' => 'mysql:host=localhost;dbname=my_database',
+    'driver'   => 'mysql',
+    'dsn'      => 'mysql:host=localhost;dbname=my_database',
     'username' => 'root',
     'password' => 'qwerty',
-    'prefix' => 'test_'
+    'prefix'   => 'test_'
 ]);
 
 $database->statement('
@@ -41,7 +41,7 @@ Key features:
 * Light with a small number of light dependencies.
 * Extensible. Examples will come soon.
 * The [query builder](https://github.com/FinesseRus/QueryScribe) and the 
-  [database connector](https://github.com/FinesseRus/MicroDB) may be used separately.
+  [database connector](https://github.com/FinesseRus/MicroDB) can be used separately.
 * Supports table prefixes.
 * No static facades. Explicit delivery using dependency injection. 
 * Exceptions on errors.

@@ -7,4 +7,4 @@ namespace Finesse\MiniDB\Exceptions;
  *
  * @author Surgie
  */
-class InvalidReturnValueException extends \RuntimeException implements ExceptionInterface {}
+class InvalidReturnValueException extends \LogicException implements ExceptionInterface {}
