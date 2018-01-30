@@ -58,7 +58,7 @@ If you need a new database system support please implement it [there](https://gi
 
 ## Installation
 
-You need [composer](https://getcomposer.org) to use this library. Run in a console:
+You need [Composer](https://getcomposer.org) to use this library. Run in a console:
                                                                   
 ```bash
 composer require finesse/mini-db
@@ -118,7 +118,7 @@ $database->import('path/to/file.sql');
 ```
 
 The cell values are returned as they are returned by the underlying database connection. They are not casted 
-automatically because casting can cause data loss.
+automatically because casting can cause a data loss.
 
 Table prefix is not applied in raw queries. Use `$database->addTablePrefix()` to apply it.
 
@@ -133,7 +133,7 @@ You can find more information and examples of raw queries [there](https://github
 
 ### Query builder
 
-Basic examples are present here. You can find more cool examples 
+Basic examples are presented here. You can find more cool examples 
 [there](https://github.com/FinesseRus/QueryScribe/blob/master/docs/building-queries.md)
 
 Values given to the query builder are treated safely to prevent SQL injections so you don't need to escape them.
@@ -183,7 +183,7 @@ First install Pagerfanta using [composer](https://getcomposer.org) by running in
 composer require pagerfanta/pagerfanta
 ```
 
-Then make a query from which rows should be taken:
+Then make a query from which the rows should be taken:
 
 ```php
 $query = $database
@@ -221,7 +221,7 @@ $database
     ->orderBy('id')
     ->chunk(100, function ($users) {
         foreach ($users as $user) {
-            // Process the row here
+            // Process a row here
         }
     });
 ```
@@ -306,15 +306,15 @@ $searchString = '%iamhacker%';
 $query->where('name', 'like', $query->escapeLikeWildcards($searchString).'_'); // "name" LIKE \%iamhacker\%_
 ```
 
-Wrap a table or column name in quotes:
+Wrap a table or a column name in quotes:
 
 ```php
-$query->whereRaw('MIN('.$query->quoteIdentifier('data"base').'.'.$grammar->quoteIdentifier('ta"ble').') > 10');
+$query->whereRaw('MIN('.$query->quoteIdentifier('data"base').'.'.$query->quoteIdentifier('ta"ble').') > 10');
 // or
 $query->whereRaw('MIN('.$query->quoteCompositeIdentifier('data"base.ta"ble').') > 10'); // MIN("data""base"."ta""ble") > 10
 ```
 
-The above methods are also available in a `Database` object.
+The above methods are also available in `Database` object.
 
 
 ## Versions compatibility
