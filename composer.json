@@ -19,7 +19,7 @@
 	"require-dev": {
 		"ext-pdo_sqlite": "*",
 		"phpunit/phpunit": "^6.4",
-		"pagerfanta/pagerfanta": "^1.0"
+		"pagerfanta/pagerfanta": "^1.0 || ^2.0"
 	},
 	"suggest": {
 		"pagerfanta/pagerfanta": "To make pagination"
