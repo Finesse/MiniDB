@@ -3,8 +3,8 @@
 [![Latest Stable Version](https://poser.pugx.org/finesse/mini-db/v/stable)](https://packagist.org/packages/finesse/mini-db)
 [![Total Downloads](https://poser.pugx.org/finesse/mini-db/downloads)](https://packagist.org/packages/finesse/mini-db)
 ![PHP from Packagist](https://img.shields.io/packagist/php-v/finesse/mini-db.svg)
-[![Build Status](https://travis-ci.org/FinesseRus/MiniDB.svg?branch=master)](https://travis-ci.org/FinesseRus/MiniDB)
-[![Coverage Status](https://coveralls.io/repos/github/FinesseRus/MiniDB/badge.svg?branch=master)](https://coveralls.io/github/FinesseRus/MiniDB?branch=master)
+[![Build Status](https://travis-ci.org/Finesse/MiniDB.svg?branch=master)](https://travis-ci.org/Finesse/MiniDB)
+[![Coverage Status](https://coveralls.io/repos/github/Finesse/MiniDB/badge.svg?branch=master)](https://coveralls.io/github/Finesse/MiniDB?branch=master)
 [![Dependency Status](https://www.versioneye.com/php/finesse:mini-db/badge)](https://www.versioneye.com/php/finesse:mini-db)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/0bd36bc4-7474-408e-ac6d-70f8609ce370/mini.png)](https://insight.sensiolabs.com/projects/0bd36bc4-7474-408e-ac6d-70f8609ce370)
 
@@ -41,8 +41,8 @@ Key features:
 
 * Light with a small number of light dependencies.
 * Extensible. Examples will come soon.
-* The [query builder](https://github.com/FinesseRus/QueryScribe) and the 
-  [database connector](https://github.com/FinesseRus/MicroDB) can be used separately.
+* The [query builder](https://github.com/Finesse/QueryScribe) and the 
+  [database connector](https://github.com/Finesse/MicroDB) can be used separately.
 * Supports table prefixes.
 * No static facades. Explicit delivery using dependency injection. 
 * Exceptions on errors.
@@ -53,8 +53,8 @@ Supported DBMSs:
 * SQLite
 * Maybe any other, didn't test it
 
-If you need a new database system support please implement it [there](https://github.com/FinesseRus/MicroDB) and 
-[there](https://github.com/FinesseRus/QueryScribe) using pull requests.
+If you need a new database system support please implement it [there](https://github.com/Finesse/MicroDB) and 
+[there](https://github.com/Finesse/QueryScribe) using pull requests.
 
 
 ## Installation
@@ -130,12 +130,12 @@ $database->select('SELECT * FROM '.$database->addTablePrefix('users').' ORDER BY
 Be careful, the `statements` and the `import` methods don't throw an exception if the second or a next statement of the 
 query has an error. This is [a PDO bug](https://stackoverflow.com/a/28867491/1118709).
 
-You can find more information and examples of raw queries [there](https://github.com/FinesseRus/MicroDB#reference).
+You can find more information and examples of raw queries [there](https://github.com/Finesse/MicroDB#reference).
 
 ### Query builder
 
 Basic examples are presented here. You can find more cool examples 
-[there](https://github.com/FinesseRus/QueryScribe/blob/master/docs/building-queries.md).
+[there](https://github.com/Finesse/QueryScribe/blob/master/docs/building-queries.md).
 
 Values given to the query builder are treated safely to prevent SQL injections so you don't need to escape them.
 

@@ -3,7 +3,7 @@
 	"description": "Light database abstraction with a query builder",
 	"keywords": ["sql", "query builder", "database", "mysql", "sqlite", "pdo"],
 	"type": "library",
-	"homepage": "https://github.com/FinesseRus/MiniDB",
+	"homepage": "https://github.com/Finesse/MiniDB",
 	"license": "MIT",
 	"authors": [
 		{
