@@ -151,7 +151,7 @@ class QueryProxyTest extends TestCase
         });
 
         $this->assertException(InvalidReturnValueException::class, function () use ($superQuery) {
-            $superQuery->applyCallback(function () {
+            $superQuery->apply(function () {
                 return 'hello';
             });
         }, function (InvalidReturnValueException $exception) {

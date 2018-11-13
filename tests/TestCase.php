@@ -23,7 +23,7 @@ class TestCase extends BaseTestCase
         try {
             $callback();
         } catch (\Throwable $exception) {
-            $this->assertInstanceOf($expectClass, $exception);
+            $this->assertInstanceOf($expectClass, $exception, "The thrown exception is not an instance of $expectClass");
             if ($onException) {
                 $onException($exception);
             }

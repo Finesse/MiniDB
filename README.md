@@ -176,7 +176,7 @@ $database
 
 ##### Pagination
 
-We suggest [Pagerfanta](https://github.com/whiteoctober/Pagerfanta) to easily make pagination.
+We suggest [Pagerfanta](https://github.com/whiteoctober/Pagerfanta) to make a pagination easily.
 
 First install Pagerfanta using [composer](https://getcomposer.org) by running in a console:
 
@@ -315,7 +315,7 @@ $query->whereRaw('MIN('.$query->quoteIdentifier('data"base').'.'.$query->quoteId
 $query->whereRaw('MIN('.$query->quoteCompositeIdentifier('data"base.ta"ble').') > 10'); // MIN("data""base"."ta""ble") > 10
 ```
 
-The above methods are also available in `Database` object.
+The above methods are also available in a `Database` object.
 
 
 ## Versions compatibility
