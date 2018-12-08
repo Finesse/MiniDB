@@ -39,14 +39,6 @@ class Query extends BaseQuery
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function makeEmptyCopy(): BaseQuery
-    {
-        return new static($this->database);
-    }
-
-    /**
      * Updates the query target rows. Doesn't modify itself.
      *
      * @param mixed[]|\Closure[]|self[]|StatementInterface[] $values Fields to update. The indexes are the columns
@@ -88,6 +80,14 @@ class Query extends BaseQuery
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function constructEmptyCopy(): BaseQuery
+    {
+        return new static($this->database);
     }
 
     /**
