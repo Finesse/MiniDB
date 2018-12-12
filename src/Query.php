@@ -9,6 +9,7 @@ use Finesse\MiniDB\Exceptions\InvalidReturnValueException;
 use Finesse\MiniDB\Parts\InsertTrait;
 use Finesse\MiniDB\Parts\RawHelpersTrait;
 use Finesse\MiniDB\Parts\SelectTrait;
+use Finesse\QueryScribe\PostProcessors\ExplicitTables;
 use Finesse\QueryScribe\Query as BaseQuery;
 use Finesse\QueryScribe\StatementInterface;
 
@@ -52,8 +53,7 @@ class Query extends BaseQuery
     public function update(array $values): int
     {
         try {
-            $query = (clone $this)->addUpdate($values);
-            $query = $this->database->getTablePrefixer()->process($query);
+            $query = (clone $this)->addUpdate($values)->apply($this->database->getTablePrefixer());
             $compiled = $this->database->getGrammar()->compileUpdate($query);
             return $this->database->update($compiled->getSQL(), $compiled->getBindings());
         } catch (\Throwable $exception) {
@@ -73,13 +73,24 @@ class Query extends BaseQuery
     public function delete(): int
     {
         try {
-            $query = (clone $this)->setDelete();
-            $query = $this->database->getTablePrefixer()->process($query);
+            $query = (clone $this)->setDelete()->apply($this->database->getTablePrefixer());
             $compiled = $this->database->getGrammar()->compileDelete($query);
             return $this->database->delete($compiled->getSQL(), $compiled->getBindings());
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
+    }
+
+    /**
+     * Makes the query have explicit tables in the column names.
+     *
+     * Warning! In contrast to the other methods, it doesn't modify the query object, it returns a new object.
+     *
+     * @return static
+     */
+    public function addTablesToColumnNames(): self
+    {
+        return $this->apply(new ExplicitTables);
     }
 
     /**

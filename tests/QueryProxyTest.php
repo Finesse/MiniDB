@@ -136,6 +136,28 @@ class QueryProxyTest extends TestCase
     }
 
     /**
+     * Tests the `addTablesToColumnNames` method
+     */
+    public function testAddTablesToColumnNames()
+    {
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'pre_']);
+
+        $query = $database->table('items')->addSelect('name');
+        $superQuery = (new class ($query) extends QueryProxy {
+            public function getBaseQuery(): \Finesse\QueryScribe\Query {
+                return parent::getBaseQuery();
+            }
+        });
+        $explicitQuery = $superQuery->addTablesToColumnNames();
+
+        $this->assertSame($superQuery, $explicitQuery);
+        $this->assertEquals(
+            $database->table('items')->addSelect('items.name'),
+            $explicitQuery->getBaseQuery()->setClosureResolver(null)
+        );
+    }
+
+    /**
      * Tests other errors handling
      */
     public function testErrors()

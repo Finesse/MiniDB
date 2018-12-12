@@ -317,6 +317,19 @@ $query->whereRaw('MIN('.$query->quoteCompositeIdentifier('data"base.ta"ble').') 
 
 The above methods are also available in a `Database` object.
 
+Make all the column names in the query have explicit table name or alias:
+
+```php
+$database
+    ->table('users', 'u')
+    ->addSelect('name')
+    ->where('status', 'verified')
+    ->orWhere('u.type', 'admin')
+    ->addTablesToColumnNames();
+
+// SELECT "name" FROM "users" AS "u" WHERE "status" = ? OR "u"."type" = ?
+```
+
 
 ## Versions compatibility
 

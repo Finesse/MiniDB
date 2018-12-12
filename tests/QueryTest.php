@@ -78,6 +78,36 @@ class QueryTest extends TestCase
     }
 
     /**
+     * Tests the `addTablesToColumnNames` method
+     */
+    public function testAddTablesToColumnNames()
+    {
+        $database = Database::create(['driver' => 'sqlite', 'dsn' => 'sqlite::memory:', 'prefix' => 'pre_']);
+        $database->statement('CREATE TABLE '.$database->addTablePrefix('items')
+            . '(id INTEGER PRIMARY KEY ASC, name TEXT)');
+        $database->insert(
+            'INSERT INTO '.$database->addTablePrefix('items').' (name) VALUES (?), (?), (?), (?)',
+            ['Mars', 'Venus', 'Earth', 'Pluto']
+        );
+
+        $query = $database->table('items')->addSelect('name');
+        $explicitQuery = $query->addTablesToColumnNames();
+        $this->assertEquals(
+            $database->table('items')->addSelect('name'),
+            $query
+        );
+        $this->assertEquals(
+            $database->table('items')->addSelect('items.name'),
+            $explicitQuery
+        );
+
+        $this->assertEquals([
+            ['name' => 'Mars'],
+            ['name' => 'Venus']
+        ], $explicitQuery->limit(2)->get());
+    }
+
+    /**
      * Tests more error cases
      */
     public function testErrors()

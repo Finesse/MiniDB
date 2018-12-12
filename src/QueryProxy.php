@@ -78,6 +78,18 @@ class QueryProxy extends BaseQueryProxy
     }
 
     /**
+     * {@inheritDoc}
+     * Changes the current object instead of returning a new object.
+     *
+     * @return $this
+     */
+    public function addTablesToColumnNames(): self
+    {
+        $this->baseQuery = $this->baseQuery->addTablesToColumnNames();
+        return $this;
+    }
+
+    /**
      * Processes a row fetched from the database before returning it.
      *
      * @param array $row
