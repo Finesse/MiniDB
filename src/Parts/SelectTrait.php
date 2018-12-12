@@ -7,10 +7,13 @@ use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
 use Finesse\MiniDB\Exceptions\InvalidReturnValueException;
+use Finesse\MiniDB\Query;
 use Finesse\QueryScribe\StatementInterface;
 
 /**
  * Contains methods for performing select queries with Query.
+ *
+ * @mixin Query
  *
  * @author Surgie
  */
@@ -31,7 +34,7 @@ trait SelectTrait
     public function get(): array
     {
         try {
-            $query = $this->database->getTablePrefixer()->process($this);
+            $query = $this->apply($this->database->getTablePrefixer());
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->select($compiled->getSQL(), $compiled->getBindings());
         } catch (\Throwable $exception) {
@@ -49,8 +52,7 @@ trait SelectTrait
     public function first()
     {
         try {
-            $query = (clone $this)->limit(1);
-            $query = $this->database->getTablePrefixer()->process($query);
+            $query = (clone $this)->limit(1)->apply($this->database->getTablePrefixer());
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings());
         } catch (\Throwable $exception) {
@@ -74,7 +76,7 @@ trait SelectTrait
             $query = clone $this;
             $query->select = [];
             $query->addCount($column, 'aggregate')->offset(null)->limit(null);
-            $query = $this->database->getTablePrefixer()->process($query);
+            $query = $query->apply($this->database->getTablePrefixer());
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         } catch (\Throwable $exception) {
@@ -98,7 +100,7 @@ trait SelectTrait
             $query = clone $this;
             $query->select = [];
             $query->addAvg($column, 'aggregate')->offset(null)->limit(null);
-            $query = $this->database->getTablePrefixer()->process($query);
+            $query = $query->apply($this->database->getTablePrefixer());
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         } catch (\Throwable $exception) {
@@ -122,7 +124,7 @@ trait SelectTrait
             $query = clone $this;
             $query->select = [];
             $query->addSum($column, 'aggregate')->offset(null)->limit(null);
-            $query = $this->database->getTablePrefixer()->process($query);
+            $query = $query->apply($this->database->getTablePrefixer());
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         } catch (\Throwable $exception) {
@@ -146,7 +148,7 @@ trait SelectTrait
             $query = clone $this;
             $query->select = [];
             $query->addMin($column, 'aggregate')->offset(null)->limit(null);
-            $query = $this->database->getTablePrefixer()->process($query);
+            $query = $query->apply($this->database->getTablePrefixer());
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         } catch (\Throwable $exception) {
@@ -170,7 +172,7 @@ trait SelectTrait
             $query = clone $this;
             $query->select = [];
             $query->addMax($column, 'aggregate')->offset(null)->limit(null);
-            $query = $this->database->getTablePrefixer()->process($query);
+            $query = $query->apply($this->database->getTablePrefixer());
             $compiled = $this->database->getGrammar()->compileSelect($query);
             return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
         } catch (\Throwable $exception) {

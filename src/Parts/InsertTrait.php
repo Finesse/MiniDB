@@ -12,6 +12,8 @@ use Finesse\QueryScribe\StatementInterface;
 /**
  * Contains methods for performing insert queries with Query.
  *
+ * @mixin Query
+ *
  * @author Surgie
  */
 trait InsertTrait
@@ -34,8 +36,7 @@ trait InsertTrait
     public function insert(array $rows): int
     {
         try {
-            $query = (clone $this)->addInsert($rows);
-            $query = $this->database->getTablePrefixer()->process($query);
+            $query = (clone $this)->addInsert($rows)->apply($this->database->getTablePrefixer());
             $statements = $this->database->getGrammar()->compileInsert($query);
 
             $count = 0;
@@ -63,8 +64,7 @@ trait InsertTrait
     public function insertGetId(array $row, string $sequence = null)
     {
         try {
-            $query = (clone $this)->addInsert([$row]);
-            $query = $this->database->getTablePrefixer()->process($query);
+            $query = (clone $this)->addInsert([$row])->apply($this->database->getTablePrefixer());
             $statements = $this->database->getGrammar()->compileInsert($query);
 
             $id = null;
