@@ -73,12 +73,9 @@ trait SelectTrait
     public function count($column = '*'): int
     {
         try {
-            $query = clone $this;
-            $query->select = [];
-            $query->addCount($column, 'aggregate')->offset(null)->limit(null);
-            $query = $query->apply($this->database->getTablePrefixer());
-            $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
+            return $this->getAggregate(function (Query $query) use ($column) {
+                $query->addCount($column);
+            });
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
@@ -97,12 +94,9 @@ trait SelectTrait
     public function avg($column)
     {
         try {
-            $query = clone $this;
-            $query->select = [];
-            $query->addAvg($column, 'aggregate')->offset(null)->limit(null);
-            $query = $query->apply($this->database->getTablePrefixer());
-            $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
+            return $this->getAggregate(function (Query $query) use ($column) {
+                $query->addAvg($column);
+            });
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
@@ -121,12 +115,9 @@ trait SelectTrait
     public function sum($column)
     {
         try {
-            $query = clone $this;
-            $query->select = [];
-            $query->addSum($column, 'aggregate')->offset(null)->limit(null);
-            $query = $query->apply($this->database->getTablePrefixer());
-            $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
+            return $this->getAggregate(function (Query $query) use ($column) {
+                $query->addSum($column);
+            });
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
@@ -145,12 +136,9 @@ trait SelectTrait
     public function min($column)
     {
         try {
-            $query = clone $this;
-            $query->select = [];
-            $query->addMin($column, 'aggregate')->offset(null)->limit(null);
-            $query = $query->apply($this->database->getTablePrefixer());
-            $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
+            return $this->getAggregate(function (Query $query) use ($column) {
+                $query->addMin($column);
+            });
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
@@ -169,12 +157,9 @@ trait SelectTrait
     public function max($column)
     {
         try {
-            $query = clone $this;
-            $query->select = [];
-            $query->addMax($column, 'aggregate')->offset(null)->limit(null);
-            $query = $query->apply($this->database->getTablePrefixer());
-            $compiled = $this->database->getGrammar()->compileSelect($query);
-            return $this->database->selectFirst($compiled->getSQL(), $compiled->getBindings())['aggregate'];
+            return $this->getAggregate(function (Query $query) use ($column) {
+                $query->addMax($column);
+            });
         } catch (\Throwable $exception) {
             return $this->handleException($exception);
         }
@@ -210,5 +195,26 @@ trait SelectTrait
                 break;
             }
         }
+    }
+
+    /**
+     * Gets an aggregate value (count, sum, etc.) from this query
+     *
+     * @param callable $prepareAggregate Takes a query object and must add an aggregate to the SELECT part of the query
+     * @return mixed
+     */
+    protected function getAggregate(callable $prepareAggregate)
+    {
+        $query = clone $this;
+        $query->select = [];
+        $query = $query
+            ->offset(null)
+            ->limit(null)
+            ->apply($prepareAggregate)
+            ->apply($this->database->getTablePrefixer());
+
+        $compiled = $this->database->getGrammar()->compileSelect($query);
+
+        return current($this->database->selectFirst($compiled->getSQL(), $compiled->getBindings()));
     }
 }
