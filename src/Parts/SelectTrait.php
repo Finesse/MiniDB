@@ -207,6 +207,7 @@ trait SelectTrait
     {
         $query = clone $this;
         $query->select = [];
+        $query->order = [];
         $query = $query
             ->offset(null)
             ->limit(null)

@@ -3,6 +3,7 @@
 namespace Finesse\MiniDB\Tests\Parts;
 
 use Finesse\MiniDB\Database;
+use Finesse\MiniDB\Exceptions\DatabaseException;
 use Finesse\MiniDB\Exceptions\IncorrectQueryException;
 use Finesse\MiniDB\Exceptions\InvalidArgumentException;
 use Finesse\MiniDB\Query;
@@ -131,6 +132,47 @@ class SelectTraitTest extends TestCase
         $this->assertException(IncorrectQueryException::class, function () use ($database) {
             (new Query($database))->max('value');
         });
+    }
+
+    /**
+     * Tests the aggregate functions with a query with a sort by a derived field.
+     *
+     * SQLite doesn't emit an error when an unknown field is used in the order section so MySQL is used for the test.
+     *
+     * @link https://docs.travis-ci.com/user/database-setup/#MySQL Credentials for testing MySQL in Travis CI
+     */
+    public function testAggregateWithDerivedField()
+    {
+        try {
+            $database = Database::create([
+                'driver' => 'mysql',
+                'dsn' => 'mysql:host=localhost;dbname=test;charset=UTF8',
+                'username' => 'travis',
+                'password' => '',
+                'prefix' => 'pre_'
+            ]);
+        } catch (DatabaseException $exception) {
+            $this->markTestSkipped('MySQL is not available: '.$exception->getMessage());
+            return;
+        }
+
+        $database->statement('
+            CREATE TABLE pre_items(
+                id INT(11) NOT NULL AUTO_INCREMENT,
+                value INT(11) NOT NULL,
+                PRIMARY KEY (id)
+            )
+        ');
+        for ($i = 0; $i < 30; ++$i) {
+            $database->insert('INSERT INTO pre_items (value) VALUES (?)', [$i + 100]);
+        }
+
+        $query = $database
+            ->table('items')
+            ->addSelect($database->raw('value * 2'), 'computed_value') // Select is discarded while getting an aggregate and the order gets an unknown column
+            ->orderBy('computed_value', 'desc');
+
+        $this->assertEquals($query->count(), 30);
     }
 
     /**
