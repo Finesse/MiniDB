@@ -144,11 +144,12 @@ class SelectTraitTest extends TestCase
     public function testAggregateWithDerivedField()
     {
         try {
+            // The credentials are set in the GitHub workflow file
             $database = Database::create([
                 'driver' => 'mysql',
-                'dsn' => 'mysql:host=localhost;dbname=test;charset=UTF8',
-                'username' => 'travis',
-                'password' => '',
+                'dsn' => 'mysql:host=127.0.0.1;port='.getenv('MYSQL_PORT').';dbname=test;charset=UTF8',
+                'username' => 'root',
+                'password' => 'password',
                 'prefix' => 'pre_'
             ]);
         } catch (DatabaseException $exception) {
