@@ -1,0 +1,54 @@
+name: Test
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['7.0', '7.1', '7.2', '7.3', '7.4']
+        dependencies: ['low', 'high']
+        include:
+          - php-version: '7.0'
+            dependencies: 'high'
+            report-coverage: true
+    name: PHP ${{ matrix.php-version }}, ${{ matrix.dependencies }} dependencies
+    services:
+      mysql:
+        image: mysql:5.5
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: test
+        ports:
+          - 3306
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Install PHP
+        uses: shivammathur/setup-php@1.5.6
+        with:
+          php-version: ${{ matrix.php-version }}
+          extension-csv: dom, mbstring, pdo, pdo_sqlite, pdo_mysql
+      - name: Install dependencies
+        run: |
+          if [[ ${{ matrix.dependencies }} = high ]]
+            then composer update
+            else composer update --prefer-lowest
+          fi
+      - name: Test and publish code coverage
+        if: matrix.report-coverage
+        uses: paambaati/codeclimate-action@v2.3.0
+        env:
+          MYSQL_PORT: ${{ job.services.mysql.ports['3306'] }}
+
+          # Get it on https://codeclimate.com/repos/{repo id}/settings/test_reporter
+          CC_TEST_REPORTER_ID: bfe64f2a1837915187656672399c0ecce6376a0bde88e903eff73489c4025018
+        with:
+          # The report file must be there, otherwise Code Climate won't find it
+          coverageCommand: php vendor/bin/phpunit --coverage-text --coverage-clover ./clover.xml
+          debug: true
+      - name: Test
+        if: "!matrix.report-coverage"
+        run: php vendor/bin/phpunit --coverage-text
+        env:
+          MYSQL_PORT: ${{ job.services.mysql.ports['3306'] }}

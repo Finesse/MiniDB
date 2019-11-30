@@ -3,10 +3,9 @@
 [![Latest Stable Version](https://poser.pugx.org/finesse/mini-db/v/stable)](https://packagist.org/packages/finesse/mini-db)
 [![Total Downloads](https://poser.pugx.org/finesse/mini-db/downloads)](https://packagist.org/packages/finesse/mini-db)
 ![PHP from Packagist](https://img.shields.io/packagist/php-v/finesse/mini-db.svg)
-[![Build Status](https://travis-ci.org/Finesse/MiniDB.svg?branch=master)](https://travis-ci.org/Finesse/MiniDB)
-[![Coverage Status](https://coveralls.io/repos/github/Finesse/MiniDB/badge.svg?branch=master)](https://coveralls.io/github/Finesse/MiniDB?branch=master)
-[![Dependency Status](https://www.versioneye.com/php/finesse:mini-db/badge)](https://www.versioneye.com/php/finesse:mini-db)
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/0bd36bc4-7474-408e-ac6d-70f8609ce370/mini.png)](https://insight.sensiolabs.com/projects/0bd36bc4-7474-408e-ac6d-70f8609ce370)
+[![Test Status](https://github.com/finesse/MiniDB/workflows/Test/badge.svg)](https://github.com/Finesse/MiniDB/actions?workflow=Test)
+[![Maintainability](https://api.codeclimate.com/v1/badges/f06baf6e8d688b28cd12/maintainability)](https://codeclimate.com/github/Finesse/MiniDB/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/f06baf6e8d688b28cd12/test_coverage)](https://codeclimate.com/github/Finesse/MiniDB/test_coverage)
 
 Lightweight database abstraction in which rows are simple arrays. It has both a query builder for convenient fluent 
 syntax and an interface for performing pure SQL queries.
